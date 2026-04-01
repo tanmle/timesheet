@@ -1,0 +1,101 @@
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(9, 19, 40, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(64, 72, 93, 0.2);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.navInner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.navInner::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--outline);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  position: relative;
+  min-width: 56px;
+}
+
+.navItem:hover {
+  color: var(--on-surface-variant);
+}
+
+.active {
+  color: var(--primary);
+}
+
+.active .iconWrap {
+  background: rgba(159, 167, 255, 0.1);
+  border-radius: var(--radius-full);
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 32px;
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-md);
+}
+
+.label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Center "Add" button FAB style */
+.actionItem {
+  position: relative;
+  top: -8px;
+}
+
+.actionItem .iconWrap {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+  color: var(--on-primary);
+  box-shadow: 0 4px 20px rgba(141, 152, 255, 0.3);
+  transition: all var(--transition-fast);
+}
+
+.actionItem:hover .iconWrap {
+  box-shadow: 0 6px 28px rgba(141, 152, 255, 0.45);
+  transform: scale(1.05);
+}
+
+.actionItem:active .iconWrap {
+  transform: scale(0.95);
+}
+
+.actionItem .label {
+  color: var(--primary);
+  font-weight: 600;
+}

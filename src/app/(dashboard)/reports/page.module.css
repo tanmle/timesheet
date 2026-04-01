@@ -1,0 +1,15 @@
+.header {
+  padding-top: calc(var(--space-12) + env(safe-area-inset-top, 0px));
+  margin-bottom: var(--space-8);
+}
+
+.header h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: var(--space-1);
+}
+
+.header p {
+  font-size: 0.9375rem;
+  color: var(--outline);
+}

@@ -1,0 +1,152 @@
+.header {
+  padding-top: calc(var(--space-12) + env(safe-area-inset-top, 0px));
+  margin-bottom: var(--space-6);
+}
+
+.headerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: var(--space-1);
+}
+
+/* Stats Row */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.miniStat {
+  text-align: center;
+  padding: var(--space-4) !important;
+}
+
+/* View Toggle */
+.viewToggle {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-5);
+  background: var(--surface-container);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  width: fit-content;
+}
+
+.viewBtn {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--outline);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.viewActive {
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+}
+
+/* Project Grid */
+.projectGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .projectGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.projectList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Project Card */
+.projectCard {
+  padding: var(--space-5) !important;
+  cursor: pointer;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.cardColor {
+  width: 32px;
+  height: 4px;
+  border-radius: var(--radius-full);
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.cardClient {
+  font-size: 0.8125rem;
+  color: var(--outline);
+  margin-bottom: var(--space-4);
+}
+
+.cardStats {
+  display: flex;
+  gap: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+.cardStatItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardStatValue {
+  font-family: var(--font-headline);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--on-surface);
+}
+
+.cardStatLabel {
+  font-size: 0.6875rem;
+  color: var(--outline);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Card Progress */
+.cardProgress {
+  margin-top: var(--space-2);
+}
+
+.cardProgressHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.cardProgressPercent {
+  font-family: var(--font-headline);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+}

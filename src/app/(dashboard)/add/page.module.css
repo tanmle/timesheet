@@ -1,0 +1,152 @@
+.header {
+  padding-top: calc(var(--space-12) + env(safe-area-inset-top, 0px));
+  margin-bottom: var(--space-6);
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: var(--space-1);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.section {
+  padding: var(--space-5) !important;
+}
+
+.field {
+  margin-bottom: var(--space-4);
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+/* Project Selection Grid */
+.projectGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.projectOption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(64, 72, 93, 0.15);
+  background: var(--surface-container-high);
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.projectOption:hover {
+  background: var(--surface-container-highest);
+  border-color: var(--outline-variant);
+}
+
+.projectSelected {
+  background: rgba(159, 167, 255, 0.12);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.projectDot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* Textarea */
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: var(--font-body);
+}
+
+/* Time Row */
+.timeRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.timeSeparator {
+  font-size: 1.25rem;
+  color: var(--outline);
+  padding-bottom: var(--space-3);
+}
+
+/* Duration Grid */
+.durationGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+}
+
+.durationChip {
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--outline-variant);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-family: var(--font-headline);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.durationChip:hover {
+  background: var(--surface-container-high);
+  border-color: var(--outline);
+}
+
+.durationActive {
+  background: rgba(159, 167, 255, 0.15);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Submit */
+.submitArea {
+  padding: var(--space-4) 0;
+}
+
+.submitBtn {
+  width: 100%;
+  font-size: 1rem;
+  min-height: 3.5rem;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
