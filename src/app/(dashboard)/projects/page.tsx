@@ -47,9 +47,5 @@ export default async function ProjectsPage() {
     totalHours: projects.reduce((acc, p) => acc + p.actualHours, 0)
   }
 
-  return (
-    <div className="container">
-      <ProjectClient projects={projects} globalStats={globalStats} />
-    </div>
-  )
+  return <ProjectClient projects={projects} globalStats={globalStats} />
 }

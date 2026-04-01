@@ -15,7 +15,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Luminous Ledger | Personal Timesheet',
+  title: 'Personal Timesheet',
   description: 'A premium personal timesheet and payroll management application with atmospheric precision design.',
 }
 

@@ -183,16 +183,20 @@
 
 /* Toggle */
 .toggle {
+  all: unset;
+  box-sizing: border-box;
   width: 44px;
-  height: 26px;
-  border-radius: var(--radius-full);
+  height: 24px;
+  border-radius: 999px;
   background: var(--surface-container-highest);
   border: 1px solid var(--outline-variant);
   padding: 2px;
   cursor: pointer;
   position: relative;
   transition: all var(--transition-fast);
-  flex-shrink: 0;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
 }
 
 .toggleOn {
@@ -211,7 +215,7 @@
 }
 
 .toggleOn .toggleKnob {
-  transform: translateX(18px);
+  transform: translateX(20px);
 }
 
 /* Empty State */

@@ -4,7 +4,9 @@ import { login } from './actions'
 import styles from './page.module.css'
 import { useSearchParams } from 'next/navigation'
 
-export default function LoginPage() {
+import { Suspense } from 'react'
+
+function LoginForm() {
   const searchParams = useSearchParams()
   const message = searchParams.get('message')
 
@@ -12,13 +14,13 @@ export default function LoginPage() {
     <div className={styles.wrapper}>
       <div className={styles.brandContainer}>
         <div className={styles.logo}></div>
-        <h1 className={styles.appName}>Luminous Ledger</h1>
+        <h1 className={styles.appName}>Personal Timesheet</h1>
         <p className={styles.tagline}>Elevate your time tracking.</p>
       </div>
 
       <div className={`glass-card-elevated ${styles.authCard}`}>
         <h2 className={styles.cardTitle}>Welcome Back</h2>
-        
+
         {message && (
           <div className={styles.errorMessage}>
             {message}
@@ -59,5 +61,13 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   )
 }

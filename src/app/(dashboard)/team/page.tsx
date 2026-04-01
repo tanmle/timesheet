@@ -19,10 +19,6 @@ export default async function TeamPage() {
     .select('id, name')
     .order('name')
 
-  return (
-    <div className="container">
-      <TeamClient teamMembers={teamMembers || []} projects={projects || []} />
-    </div>
-  )
+  return <TeamClient teamMembers={teamMembers || []} projects={projects || []} />
 }
 

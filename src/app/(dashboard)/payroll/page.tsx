@@ -32,16 +32,11 @@ export default async function PayrollDashboardPage() {
   })
 
   return (
-    <div className="container">
-      {/* Header */}
-      <header className={`${styles.header} animate-fade-in-up`}>
-        <div className={styles.headerTop}>
-          <div>
-            <h1>Payroll</h1>
-            <p className="text-muted">Manage compensation and team payouts efficiently.</p>
-          </div>
-        </div>
-      </header>
+    <>
+      <div style={{ marginBottom: 'var(--space-6)' }} className="animate-fade-in-up">
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Payroll History</h2>
+        <p className="text-muted" style={{ fontSize: '0.875rem' }}>Track and manage your organization's payouts.</p>
+      </div>
 
       {/* Hero Action Card */}
       <section className={`${styles.heroCard} glass-card-elevated animate-fade-in-up delay-1`} aria-label="Current payroll status">
@@ -137,8 +132,6 @@ export default async function PayrollDashboardPage() {
           ))}
         </div>
       </section>
-
-
-    </div>
+    </>
   )
 }

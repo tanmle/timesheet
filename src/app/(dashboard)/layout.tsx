@@ -2,6 +2,8 @@ import BottomNav from '@/components/BottomNav'
 import styles from './AppShell.module.css'
 import { createClient } from '@/utils/supabase/server'
 
+import GlobalHeader from './Header'
+
 export default async function AppShellLayout({
   children,
 }: {
@@ -20,7 +22,10 @@ export default async function AppShellLayout({
   return (
     <div className={styles.shell}>
       <main className={styles.main}>
-        {children}
+        <div className="container">
+          <GlobalHeader />
+          {children}
+        </div>
       </main>
       <BottomNav role={role} />
     </div>

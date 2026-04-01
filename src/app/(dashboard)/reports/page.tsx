@@ -41,9 +41,5 @@ export default async function ReportsPage() {
 
   const filteredProfiles = (isAdmin && initialProfiles) ? initialProfiles.filter(p => p.id !== user?.id) : []
   
-  return (
-    <div className="container">
-      <ReportClient initialProjects={projects} initialProfiles={filteredProfiles} isAdmin={isAdmin} />
-    </div>
-  )
+  return <ReportClient initialProjects={projects} initialProfiles={filteredProfiles} isAdmin={isAdmin} />
 }

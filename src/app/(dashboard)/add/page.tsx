@@ -24,15 +24,13 @@ export default async function AddPage() {
     .eq('user_id', user.id)
 
   return (
-    <div className="container">
-      {/* Header */}
-      <header className={`${styles.header} animate-fade-in-up`}>
-        <h1>Timesheet</h1>
-        <p className="text-muted">Log your time across active projects.</p>
-      </header>
+    <>
+      <div style={{ marginBottom: 'var(--space-6)' }} className="animate-fade-in-up">
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Timesheet</h2>
+        <p className="text-muted" style={{ fontSize: '0.875rem' }}>Log your time across active projects.</p>
+      </div>
       
-      {/* Render new Monthly Timesheet Form Experience */}
       <MonthlyTimesheetForm projects={activeProjects || []} entries={timeEntries || []} />
-    </div>
+    </>
   )
 }

@@ -71,12 +71,12 @@ export default function ReportClient({ initialProjects, initialProfiles, isAdmin
 
   return (
     <div style={{ paddingBottom: '100px' }}>
-      <header className={styles.header}>
-        <h1>Reports</h1>
-        <p className="text-muted">Analyze {isAdmin ? 'project economics' : 'your earnings'} in VND.</p>
-      </header>
+      <div style={{ marginBottom: 'var(--space-6)' }} className="animate-fade-in-up">
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Reports</h2>
+        <p className="text-muted" style={{ fontSize: '0.875rem' }}>Analyze your project economics and earnings.</p>
+      </div>
 
-      {/* Filters Card */}
+      {/* Hero Stats (Total, Paid, Pending) */}
       <div className="glass-card" style={{ padding: 'var(--space-5)', marginBottom: 'var(--space-6)', borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
            <div>

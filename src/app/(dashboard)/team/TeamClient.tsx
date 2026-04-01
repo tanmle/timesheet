@@ -208,7 +208,7 @@ export default function TeamClient({ teamMembers, projects }: { teamMembers: Mem
     
     try {
       if (modalMode === 'add') {
-        const result = await createMember(formData)
+        const result = await createMember(formData) as any
         if (result?.error) throw new Error(result.error)
         toast.success('Member added successfully', { id: toastId })
       } else {
@@ -223,22 +223,19 @@ export default function TeamClient({ teamMembers, projects }: { teamMembers: Mem
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', paddingBottom: '100px' }}>
-      {/* Header */}
-      <header className={`${styles.header} animate-fade-in-up`}>
-        <div className={styles.headerTop} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h1>Management</h1>
-            <p className="text-muted" style={{ margin: '4px 0 0 0' }}>Oversee your high-performance team and payroll permissions.</p>
-          </div>
-          <button onClick={() => setModalMode('add')} className="btn btn-primary btn-sm" style={{ display: 'flex', gap: '8px', minHeight: '40px' }} id="add-user-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Add User
-          </button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }} className="animate-fade-in-up">
+        <div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Management</h2>
+          <p className="text-muted" style={{ fontSize: '0.875rem', margin: '2px 0 0 0' }}>Oversee your team and payroll permissions.</p>
         </div>
-      </header>
+        <button onClick={() => setModalMode('add')} className="btn btn-primary" style={{ display: 'flex', gap: '8px', minHeight: '40px', padding: '0 16px' }} id="add-user-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add User
+        </button>
+      </div>
 
       {/* Summary Stats */}
       <div className={`${styles.statsRow} animate-fade-in-up delay-1`}>
