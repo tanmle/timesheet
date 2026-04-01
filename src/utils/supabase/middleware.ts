@@ -41,8 +41,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // If user is already logged in, they shouldn't be at /login
-  if (user && request.nextUrl.pathname.startsWith('/login')) {
+  // If user is already logged in, they shouldn't be at /login (except for updating password)
+  if (user && request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/login/update-password')) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)
