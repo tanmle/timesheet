@@ -3,6 +3,7 @@
 import { login } from './actions'
 import styles from './page.module.css'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 
 import { Suspense } from 'react'
 
@@ -41,7 +42,12 @@ function LoginForm() {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="password" className="input-label">Password</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <label htmlFor="password" className="input-label" style={{ margin: 0 }}>Password</label>
+              <Link href="/login/forgot-password" style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
+                Forgot Password?
+              </Link>
+            </div>
             <input
               id="password"
               name="password"
