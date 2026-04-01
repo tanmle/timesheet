@@ -35,7 +35,7 @@ function LoginForm() {
               name="email"
               type="email"
               className="input-field"
-              placeholder="you@company.com"
+              placeholder="you@email.com"
               required
             />
           </div>
