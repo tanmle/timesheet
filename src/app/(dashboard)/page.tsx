@@ -35,7 +35,7 @@ export default async function DashboardPage() {
     .single()
 
   if (profile?.role !== 'admin') {
-    redirect('/reports')
+    redirect('/add')
   }
 
   // Fetch active projects conditionally based on access
