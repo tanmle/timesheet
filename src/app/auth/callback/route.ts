@@ -2,22 +2,29 @@ import { createClient } from '@/utils/supabase/server'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/'
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const type = requestUrl.searchParams.get('type')
+  const next = requestUrl.searchParams.get('next') ?? '/'
+  const origin = requestUrl.origin
 
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error) {
-      if (searchParams.get('type') === 'recovery' || request.nextUrl.searchParams.get('next')?.includes('recovery')) {
-        return NextResponse.redirect(`${origin}/login/update-password`)
+      // If it's a recovery flow, prioritize the password update page
+      if (type === 'recovery' || next.includes('recovery')) {
+        const response = NextResponse.redirect(`${origin}/login/update-password`)
+        return response
       }
-      return NextResponse.redirect(`${origin}${next}`)
+      
+      // Otherwise, redirect to the intended page
+      const response = NextResponse.redirect(`${origin}${next}`)
+      return response
     }
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/login?message=Could not verify auth link`)
+  // Handle errors or missing code with a clear message
+  return NextResponse.redirect(`${origin}/login?message=Authentication failed. Please try again.`)
 }

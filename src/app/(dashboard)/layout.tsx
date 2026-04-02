@@ -22,7 +22,7 @@ export default async function AppShellLayout({
   return (
     <div className={styles.shell}>
       <main className={styles.main}>
-        <div className="container">
+        <div className="container animate-fade-in">
           <GlobalHeader />
           {children}
         </div>

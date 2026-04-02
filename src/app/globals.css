@@ -497,9 +497,24 @@ select option {
   100% { background-position: 200% 0; }
 }
 
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(141, 152, 255, 0.3); }
-  50% { box-shadow: 0 0 0 8px rgba(141, 152, 255, 0); }
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, 
+    rgba(25, 37, 64, 0.5) 25%, 
+    rgba(99, 102, 241, 0.1) 50%, 
+    rgba(25, 37, 64, 0.5) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: var(--radius-md);
 }
 
 .animate-fade-in-up {
@@ -540,4 +555,56 @@ select option {
   .container {
     max-width: 1024px;
   }
+}
+
+/* ----- Navigation Loading (NProgress) ----- */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: linear-gradient(90deg, transparent 0%, var(--primary) 50%, var(--secondary) 100%);
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  box-shadow: 0 0 10px var(--primary), 0 0 5px var(--secondary);
+}
+
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 15px var(--primary), 0 0 8px var(--primary);
+  opacity: 1.0;
+  transform: rotate(3deg) translate(0px, -4px);
+}
+
+#nprogress .spinner {
+  display: block;
+  position: fixed;
+  z-index: 10000;
+  top: 15px;
+  right: 15px;
+}
+
+#nprogress .spinner-icon {
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  border: solid 2.5px transparent;
+  border-top-color: var(--primary);
+  border-left-color: var(--secondary);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(159, 167, 255, 0.3);
+  animation: nprogress-spinner 400ms linear infinite;
+}
+
+@keyframes nprogress-spinner {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
