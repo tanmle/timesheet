@@ -30,7 +30,12 @@ export default async function AddPage() {
         <p className="text-muted" style={{ fontSize: '0.875rem' }}>Log your time across active projects.</p>
       </div>
       
-      <MonthlyTimesheetForm projects={activeProjects || []} entries={timeEntries || []} />
+      <MonthlyTimesheetForm 
+        projects={activeProjects || []} 
+        entries={timeEntries || []} 
+        month={new Date().getMonth()} 
+        year={new Date().getFullYear()} 
+      />
     </>
   )
 }
