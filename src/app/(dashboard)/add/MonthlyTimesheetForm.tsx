@@ -246,35 +246,55 @@ export default function MonthlyTimesheetForm({
 
                 {isLastSelected && isModalOpen && (
                   <div style={{
-                    position: 'absolute', bottom: 'calc(100% + 10px)', left: '50%', transform: 'translateX(-50%)',
-                    background: '#0F172A', borderRadius: '16px', padding: 'var(--space-3)', boxShadow: '0 10px 25px rgba(0,0,0,0.8)', zIndex: 9999, width: '210px', border: '1px solid rgba(255,255,255,0.1)'
+                    position: 'absolute', bottom: 'calc(100% + 12px)', left: '50%', transform: 'translateX(-50%)',
+                    background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(16px)', borderRadius: '20px', padding: '16px', 
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1)', zIndex: 9999, width: '220px',
+                    border: '1px solid rgba(255,255,255,0.05)', animation: 'popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                   }}>
-                    <form action={addTimeEntry} onSubmit={() => setTimeout(() => { setIsModalOpen(false); setSelectedDates([]) }, 500)} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    <form action={addTimeEntry} onSubmit={() => setTimeout(() => { setIsModalOpen(false); setSelectedDates([]) }, 500)} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       <input type="hidden" name="dates" value={selectedDates.join(',')} />
                       <input type="hidden" name="project_id" value={selectedProjectId} />
                       <input type="hidden" name="task" value="General Work" />
                       
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--on-surface-variant)', fontWeight: 600 }}>
-                          {selectedDates.length > 1 ? `${selectedDates.length} Days` : 'Log hours'}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          {selectedDates.length > 1 ? `${selectedDates.length} Days Selected` : 'Log hours'}
                         </span>
                         {hasLoggedTimeInSelection && (
                           <button 
                             type="submit"
                             formAction={deleteTimeEntries}
                             onClick={() => setTimeout(() => { setIsModalOpen(false); setSelectedDates([]) }, 500)}
-                            style={{ background: 'transparent', border: 'none', color: '#f87171', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', padding: '2px 4px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                            style={{ background: 'rgba(239, 68, 68, 0.1)', border: 'none', color: '#f87171', fontSize: '0.6rem', fontWeight: 700, cursor: 'pointer', padding: '4px 8px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '4px', transition: 'all 0.2s' }}
                           >
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            Clear
+                            CLEAR
                           </button>
                         )}
                       </div>
 
-                      <div style={{ display: 'flex', gap: 'var(--space-2)' }}><DurationPickerSmall initialMins={selectedDates.length === 1 ? Math.round((hoursByDate[selectedDates[0]] || 0) * 60) : 0} /></div>
-                      <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                        <button type="button" onClick={() => { setIsModalOpen(false); setSelectedDates([]) }} style={{ flex: 1, minHeight: '36px', borderRadius: '8px', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#fff' }}>Cancel</button>
-                        <button type="submit" style={{ flex: 1, minHeight: '36px', borderRadius: '8px', background: '#2563EB', color: '#fff', border: 'none' }}>Save</button>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <DurationPickerSmall initialMins={selectedDates.length === 1 ? Math.round((hoursByDate[selectedDates[0]] || 0) * 60) : 0} />
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                        <button 
+                          type="button" 
+                          onClick={() => { setIsModalOpen(false); setSelectedDates([]) }} 
+                          style={{ flex: 1, height: '40px', borderRadius: '12px', background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: '0.8125rem', fontWeight: 600, transition: 'all 0.2s' }}
+                          onMouseOver={(e) => (e.currentTarget.style.color = '#fff')}
+                          onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          type="submit" 
+                          style={{ flex: 2, height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '0.8125rem', fontWeight: 700, boxShadow: '0 4px 10px rgba(37, 99, 235, 0.2)', transition: 'all 0.2s' }}
+                          onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
+                          onMouseOut={(e) => (e.currentTarget.style.transform = 'none')}
+                        >
+                          Save Entry
+                        </button>
                       </div>
                     </form>
                   </div>
@@ -318,13 +338,60 @@ function DurationPickerSmall({ initialMins = 0 }: { initialMins?: number }) {
   const [h, setH] = useState(initialMins > 0 ? Math.floor(initialMins / 60).toString() : '')
   const [m, setM] = useState(initialMins > 0 ? (initialMins % 60).toString() : '')
   const totalMins = (Number(h || 0) * 60) + Number(m || 0)
+  
+  const inputStyle: React.CSSProperties = {
+    width: '100%', height: '40px', background: 'rgba(255,255,255,0.03)', 
+    borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', 
+    color: '#fff', textAlign: 'center', fontSize: '0.9375rem', fontWeight: 600,
+    outline: 'none', appearance: 'none', MozAppearance: 'textfield', transition: 'all 0.2s'
+  }
+
+  const chipStyle: React.CSSProperties = {
+    flex: 1, height: '24px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', 
+    fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s',
+    display: 'flex', alignItems: 'center', justifyContent: 'center'
+  }
+
+  const labelStyle: React.CSSProperties = {
+    position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+    fontSize: '0.6rem', color: 'rgba(255,255,255,0.2)', fontWeight: 800, pointerEvents: 'none',
+    letterSpacing: '0.05em'
+  }
+
+  const handleChipClick = (hours: string) => {
+    setH(hours)
+    setM('0')
+  }
+
   return (
     <>
-      <div style={{ flex: 1, position: 'relative' }}>
-         <input type="number" value={h} onChange={e => setH(e.target.value)} placeholder="0" className={styles.dateInput} style={{ width: '100%', minHeight: '36px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} min="0" />
-      </div>
-      <div style={{ flex: 1, position: 'relative' }}>
-         <input type="number" value={m} onChange={e => setM(e.target.value)} placeholder="0" className={styles.dateInput} style={{ width: '100%', minHeight: '36px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} min="0" />
+      <style>{`
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        @keyframes popIn { from { transform: translateX(-50%) translateY(10px) scale(0.95); opacity: 0; } to { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; } }
+        .time-chip:hover { background: rgba(255,255,255,0.1) !important; color: #fff !important; transform: translateY(-1px); }
+      `}</style>
+      
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* Quick Suggestions */}
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {['1', '2', '4'].map(val => (
+            <button key={val} type="button" onClick={() => handleChipClick(val)} className="time-chip" style={chipStyle}>
+              {val}h
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ flex: 1, position: 'relative' }}>
+             <input type="number" value={h} onChange={e => setH(e.target.value)} placeholder="0" style={inputStyle} min="0" />
+             <span style={labelStyle}>H</span>
+          </div>
+          <div style={{ flex: 1, position: 'relative' }}>
+             <input type="number" value={m} onChange={e => setM(e.target.value)} placeholder="0" style={inputStyle} min="0" max="59" />
+             <span style={labelStyle}>M</span>
+          </div>
+        </div>
       </div>
       <input type="hidden" name="duration" value={totalMins > 0 ? totalMins : ''} required />
     </>
