@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { signOut } from './actions'
 import styles from './page.module.css'
+import NotificationCenter from '@/components/NotificationCenter'
 
 export default async function GlobalHeader() {
   const supabase = await createClient()
@@ -37,6 +38,7 @@ export default async function GlobalHeader() {
           <h1 className={styles.userName}>{firstName}</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+          <NotificationCenter />
           <form action={signOut}>
             <button type="submit" className="btn-icon" style={{ color: 'var(--error)' }} aria-label="Sign Out" title="Sign Out">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

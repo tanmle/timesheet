@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { notifyAdmins } from '@/utils/notifications'
 
 export async function addTimeEntry(formData: FormData) {
   const supabase = await createClient()
@@ -83,4 +84,28 @@ export async function deleteTimeEntries(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
+}
+
+export async function requestPayment(month: string, year: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  // Get profile name for better notification
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', user.id)
+    .single()
+
+  const name = profile?.full_name || user.email
+
+  await notifyAdmins({
+    title: 'Payment Requested 💰',
+    message: `${name} has requested payment for ${month} ${year}.`,
+    type: 'request'
+  })
+
+  revalidatePath('/', 'layout')
+  return { success: true }
 }

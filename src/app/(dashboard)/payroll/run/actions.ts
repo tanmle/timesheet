@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { createNotification } from '@/utils/notifications'
 
 export async function toggleEntryPaidStatus(entryId: string, currentlyPaid: boolean) {
   const supabase = createAdminClient()
@@ -14,6 +15,24 @@ export async function toggleEntryPaidStatus(entryId: string, currentlyPaid: bool
 
   if (error) {
     throw new Error('Failed to update entry payment status')
+  }
+
+  // Notify the user about the payment status update
+  if (!currentlyPaid) { // Only notify if we just marked it as PAID
+    const { data: entry } = await supabase
+      .from('time_entries')
+      .select('user_id, date')
+      .eq('id', entryId)
+      .single()
+
+    if (entry) {
+      await createNotification({
+        userId: entry.user_id,
+        title: 'Entry Paid ✅',
+        message: `Your entry for ${new Date(entry.date).toLocaleDateString()} has been marked as paid.`,
+        type: 'success'
+      })
+    }
   }
 
   revalidatePath('/payroll/run')
@@ -62,6 +81,14 @@ export async function processEmployeePayroll(
     console.error('Update Error:', updateError)
     throw new Error('Failed to mark entries as paid')
   }
+
+  // Notify the employee
+  await createNotification({
+    userId: empId,
+    title: 'Payroll Paid! 💰',
+    message: `Your payroll for ${monthName} has been processed: ${totalAmount.toLocaleString()}đ.`,
+    type: 'payment'
+  })
 
   revalidatePath('/payroll/run')
   revalidatePath('/payroll')

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import styles from './page.module.css'
 import DurationPicker from './DurationPicker'
-import { addTimeEntry, deleteTimeEntries } from './actions'
+import { addTimeEntry, deleteTimeEntries, requestPayment } from './actions'
 
 type Project = { id: string, name: string }
 type TimeEntry = { date: string, duration_minutes: number, project_id: string, is_paid: boolean }
@@ -263,6 +263,27 @@ export default function MonthlyTimesheetForm({ projects, entries }: { projects: 
               </div>
             )
           })}
+        </div>
+      </section>
+
+      {/* Request Payment Footer */}
+      <section className="animate-fade-in-up delay-2" style={{ marginTop: 'var(--space-2)' }}>
+        <div className="glass-card" style={{ padding: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(159, 167, 255, 0.05)' }}>
+          <div>
+            <h4 style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 600 }}>End of Month?</h4>
+            <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Request payment for your logged hours.</p>
+          </div>
+          <button 
+            type="button"
+            className="btn-primary"
+            style={{ padding: '8px 16px', fontSize: '0.8125rem' }}
+            onClick={async () => {
+              const res = await requestPayment(monthNames[month], year.toString())
+              if (res.success) toast.success('Payment request sent to admins!')
+            }}
+          >
+            Request Payment
+          </button>
         </div>
       </section>
     </div>

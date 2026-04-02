@@ -1,6 +1,8 @@
 .header {
   padding-top: calc(var(--space-12) + env(safe-area-inset-top, 0px));
   margin-bottom: var(--space-8);
+  position: relative;
+  z-index: 100;
 }
 
 .headerTop {
