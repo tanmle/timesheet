@@ -28,7 +28,7 @@ function LoginForm() {
           </div>
         )}
 
-        <form className={styles.form}>
+        <form action={login} className={styles.form}>
           <div className={styles.formGroup}>
             <label htmlFor="email" className="input-label">Email</label>
             <input
@@ -62,7 +62,7 @@ function LoginForm() {
           </div>
 
           <button
-            formAction={login}
+            type="submit"
             className={`btn btn-primary ${styles.submitBtn}`}
           >
             Sign In
