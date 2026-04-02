@@ -267,25 +267,30 @@ export default function MonthlyTimesheetForm({ projects, entries }: { projects: 
       </section>
 
       {/* Request Payment Footer */}
-      <section className="animate-fade-in-up delay-2" style={{ marginTop: 'var(--space-2)' }}>
-        <div className="glass-card" style={{ padding: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(159, 167, 255, 0.05)' }}>
-          <div>
-            <h4 style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 600 }}>End of Month?</h4>
-            <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Request payment for your logged hours.</p>
+      {entries.length > 0 && (
+        <section className="animate-fade-in-up delay-2" style={{ marginTop: 'var(--space-2)' }}>
+          <div className="glass-card" style={{ padding: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(159, 167, 255, 0.05)' }}>
+            <div>
+              <h4 style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 600 }}>End of Month?</h4>
+              <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>Request payment for your logged hours.</p>
+            </div>
+            <button 
+              type="button"
+              className="btn-primary"
+              disabled={entries.every((e: TimeEntry) => e.is_paid)}
+              style={{ padding: '8px 16px', fontSize: '0.8125rem', opacity: entries.every((e: TimeEntry) => e.is_paid) ? 0.5 : 1 }}
+              onClick={async () => {
+                if (window.confirm(`Are you sure you want to request payment for ${monthNames[month]} ${year}?`)) {
+                  const res = await requestPayment(monthNames[month], year.toString())
+                  if (res.success) toast.success('Payment request sent to admins!')
+                }
+              }}
+            >
+              {entries.every((e: TimeEntry) => e.is_paid) ? 'Already Paid' : 'Request Payment'}
+            </button>
           </div>
-          <button 
-            type="button"
-            className="btn-primary"
-            style={{ padding: '8px 16px', fontSize: '0.8125rem' }}
-            onClick={async () => {
-              const res = await requestPayment(monthNames[month], year.toString())
-              if (res.success) toast.success('Payment request sent to admins!')
-            }}
-          >
-            Request Payment
-          </button>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   )
 }
