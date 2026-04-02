@@ -25,7 +25,13 @@ type EmployeeData = {
   entries: any[]
 }
 
-export default function RunClient({ employeeDataObj }: { employeeDataObj: Record<string, EmployeeData> }) {
+export default function RunClient({ 
+  employeeDataObj,
+  initialParams
+}: { 
+  employeeDataObj: Record<string, EmployeeData>,
+  initialParams?: { user_id?: string, month?: string, year?: string }
+}) {
   const router = useRouter()
   const [payingEmpId, setPayingEmpId] = useState<string | null>(null)
   
@@ -143,8 +149,15 @@ export default function RunClient({ employeeDataObj }: { employeeDataObj: Record
                     <span>{initials}</span>
                   </div>
                   <div>
-                    <h2 className={styles.employeeName} style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 4px 0', color: 'var(--on-surface)' }}>{emp.profile.full_name}</h2>
-                    <p className={styles.employeeRole} style={{ margin: 0, fontSize: '0.85rem', color: 'var(--on-surface-variant)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h2 className={styles.employeeName} style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--on-surface)' }}>{emp.profile.full_name}</h2>
+                      {initialParams?.user_id === emp.profile.id && (
+                        <span style={{ background: 'rgba(234, 179, 8, 0.15)', color: '#FACC15', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', border: '1px solid rgba(234, 179, 8, 0.3)' }}>
+                          Request Target
+                        </span>
+                      )}
+                    </div>
+                    <p className={styles.employeeRole} style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: 'var(--on-surface-variant)' }}>
                       Selected: <strong style={{ color: 'var(--on-surface)' }}>{currentTotalHours.toFixed(1)}h</strong> ({selectedEntries.length} items)
                     </p>
                   </div>

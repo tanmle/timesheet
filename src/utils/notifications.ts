@@ -6,12 +6,14 @@ export async function createNotification({
   userId,
   title,
   message,
-  type = 'info'
+  type = 'info',
+  link
 }: {
   userId: string
   title: string
   message: string
   type?: NotificationType
+  link?: string
 }) {
   const supabase = createAdminClient()
   
@@ -22,6 +24,7 @@ export async function createNotification({
       title,
       message,
       type,
+      link,
       is_read: false
     })
 
@@ -34,11 +37,13 @@ export async function createNotification({
 export async function notifyAdmins({
   title,
   message,
-  type = 'info'
+  type = 'info',
+  link
 }: {
   title: string
   message: string
   type?: NotificationType
+  link?: string
 }) {
   const supabase = createAdminClient()
   
@@ -54,6 +59,7 @@ export async function notifyAdmins({
       title,
       message,
       type,
+      link,
       is_read: false
     }))
 

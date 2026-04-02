@@ -12,6 +12,7 @@ type Notification = {
   message: string
   type: 'info' | 'success' | 'warning' | 'payment' | 'request'
   is_read: boolean
+  link?: string
   created_at: string
 }
 
@@ -93,6 +94,10 @@ export default function NotificationCenter() {
               description: newNotif.message,
               icon: getIcon(newNotif.type),
               duration: 5000,
+              action: newNotif.link ? {
+                label: 'View',
+                onClick: () => window.location.href = newNotif.link!
+              } : undefined,
               style: { 
                 background: 'rgba(15, 23, 42, 0.9)', 
                 backdropFilter: 'blur(8px)',
@@ -191,10 +196,24 @@ export default function NotificationCenter() {
                   onClick={() => markAsRead(n.id)}
                 >
                   <div className={styles.icon}>{getIcon(n.type)}</div>
-                  <div className={styles.content}>
-                    <p className={styles.title}>{n.title}</p>
-                    <p className={styles.message}>{n.message}</p>
-                    <p className={styles.date}>{new Date(n.created_at).toLocaleDateString()}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <p style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 600, color: n.is_read ? 'var(--on-surface-variant)' : '#fff' }}>{n.title}</p>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--on-surface-variant)', lineHeight: 1.4 }}>{n.message}</p>
+                    {n.link && (
+                      <a 
+                        href={n.link}
+                        onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+                        style={{ 
+                          marginTop: '4px', fontSize: '0.7rem', color: '#60A5FA', 
+                          textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' 
+                        }}
+                      >
+                        Take Action <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                      </a>
+                    )}
+                    <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
+                      {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
                   {!n.is_read && <div className={styles.unreadDot} />}
                 </div>

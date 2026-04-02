@@ -100,10 +100,14 @@ export async function requestPayment(month: string, year: string) {
 
   const name = profile?.full_name || user.email
 
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+  const monthIndex = monthNames.indexOf(month)
+
   await notifyAdmins({
     title: 'Payment Requested 💰',
     message: `${name} has requested payment for ${month} ${year}.`,
-    type: 'request'
+    type: 'request',
+    link: `/payroll/run?user_id=${user.id}&month=${monthIndex}&year=${year}`
   })
 
   revalidatePath('/', 'layout')
