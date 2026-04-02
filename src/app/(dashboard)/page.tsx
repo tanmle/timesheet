@@ -1,8 +1,10 @@
 import { createClient } from '@/utils/supabase/server'
+import { getAuthUser } from '@/utils/getAuthUser'
 import styles from './page.module.css'
 import { seedDemoData, signOut } from './actions'
 import DeleteEntryButton from './components/DeleteEntryButton'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 function StatusBadge({ status }: { status: 'completed' | 'in-progress' }) {
   const isCompleted = status === 'completed'
@@ -22,62 +24,27 @@ function formatDuration(minutes: number) {
 }
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
+  const profile = await getAuthUser()
+  if (!profile) return null
 
-  // Get user profile
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
-
-  if (profile?.role !== 'admin') {
+  if (profile.role !== 'admin') {
     redirect('/add')
   }
 
-  // Fetch active projects conditionally based on access
-  let projects: any[] = []
+  const supabase = await createClient()
 
-  if (profile?.role === 'admin') {
-    const { data } = await supabase
-      .from('projects')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(3)
-    projects = data || []
-  } else {
-    const assignedIds = profile?.projects || []
-    if (assignedIds.length > 0) {
-      const { data } = await supabase
-        .from('projects')
-        .select('*')
-        .in('id', assignedIds)
-        .order('created_at', { ascending: false })
-        .limit(3)
-      projects = data || []
-    }
-  }
+  // Parallelize all data fetches since we already have user profile
+  const projectsPromise = supabase
+    .from('projects')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(3)
 
-  // Fetch recent entries
-  let recentEntriesQuery = supabase
+  const recentEntriesPromise = supabase
     .from('time_entries')
     .select('*, projects(name), profiles(full_name)')
     .order('date', { ascending: false })
     .limit(3)
-
-  if (profile?.role !== 'admin') {
-    recentEntriesQuery = recentEntriesQuery.eq('user_id', user.id)
-  }
-
-  const { data: recentEntries = [] } = await recentEntriesQuery
-
-  const hour = new Date().getHours()
-  let greeting = 'Good Evening'
-  if (hour < 12) greeting = 'Good Morning'
-  else if (hour < 17) greeting = 'Good Afternoon'
 
   const formatYMD = (d: Date) => {
     const y = d.getFullYear()
@@ -87,6 +54,23 @@ export default async function DashboardPage() {
   }
 
   const now = new Date()
+  const startOfThisMonthStr = formatYMD(new Date(now.getFullYear(), now.getMonth(), 1))
+
+  const entriesPromise = supabase
+    .from('time_entries')
+    .select('project_id, date, duration_minutes')
+    .gte('date', startOfThisMonthStr)
+
+  const [projectsRes, recentEntriesRes, entriesRes] = await Promise.all([
+    projectsPromise,
+    recentEntriesPromise,
+    entriesPromise,
+  ])
+
+  const projects = projectsRes.data || []
+  const recentEntries = recentEntriesRes.data || []
+  const filteredEntries = entriesRes.data || []
+
   const currentDate = now.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
@@ -94,33 +78,18 @@ export default async function DashboardPage() {
     year: 'numeric',
   })
   
-  const startOfThisMonthStr = formatYMD(new Date(now.getFullYear(), now.getMonth(), 1))
   const startOfLastMonthStr = formatYMD(new Date(now.getFullYear(), now.getMonth() - 1, 1))
   const endOfLastMonthStr = formatYMD(new Date(now.getFullYear(), now.getMonth(), 0))
   const todayStr = formatYMD(now)
-
-  let entriesQuery = supabase
-    .from('time_entries')
-    .select('project_id, date, duration_minutes')
-
-  if (profile?.role !== 'admin') {
-    entriesQuery = entriesQuery.eq('user_id', user.id)
-  }
-
-  const { data: allUserEntries = [] } = await entriesQuery
 
   let hoursToday = 0
   let hoursThisMonth = 0
   let hoursLastMonth = 0
   const projectHours: Record<string, number> = {}
 
-  allUserEntries?.forEach(e => {
+  filteredEntries.forEach(e => {
     const h = e.duration_minutes / 60
-
-    // Calculate per-project totals for the user
     projectHours[e.project_id] = (projectHours[e.project_id] || 0) + h
-
-    // Calculate recent stats (filter correctly)
     if (e.date === todayStr) hoursToday += h
     if (e.date >= startOfThisMonthStr) hoursThisMonth += h
     if (e.date >= startOfLastMonthStr && e.date <= endOfLastMonthStr) hoursLastMonth += h
@@ -163,7 +132,7 @@ export default async function DashboardPage() {
       <section className={`animate-fade-in-up delay-3`} aria-label="projects">
         <div className={styles.sectionHeader}>
           <h3>Projects</h3>
-          <button className="btn btn-ghost" id="view-all-projects">View All</button>
+          <Link href="/projects" className="btn btn-ghost" id="view-all-projects">View All</Link>
         </div>
         <div className={styles.projectsList}>
           {projects?.map((project, index) => {
@@ -191,7 +160,7 @@ export default async function DashboardPage() {
       <section className={`animate-fade-in-up delay-4`} aria-label="Recent time entries">
         <div className={styles.sectionHeader}>
           <h3>Recent Entries</h3>
-          <button className="btn btn-ghost" id="view-all-entries">View All</button>
+          <Link href="/reports" className="btn btn-ghost" id="view-all-entries">View All</Link>
         </div>
         <div className={styles.entriesList}>
           {recentEntries?.map((entry) => (
@@ -214,7 +183,7 @@ export default async function DashboardPage() {
               </div>
               <div className={styles.entryBottom}>
                 <span className={styles.entryTime}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
                   </svg>

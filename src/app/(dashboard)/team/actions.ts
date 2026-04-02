@@ -1,16 +1,17 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { requireAuth } from '@/utils/auth'
+import crypto from 'crypto'
+
+function generateSecurePassword(): string {
+  return crypto.randomBytes(32).toString('base64url')
+}
 
 export async function createMember(formData: FormData) {
-  const supabase = await createClient()
+  await requireAuth('admin')
   const admin = createAdminClient()
-
-  // Ensure caller is auth'd
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Not authenticated')
 
   const fullName = formData.get('full_name') as string
   const email = formData.get('email') as string
@@ -19,10 +20,11 @@ export async function createMember(formData: FormData) {
 
   if (!fullName || !email) throw new Error('Name and Email required')
 
-  // Create Auth user
+  // Create Auth user with a secure random password (user will reset via invite email)
+  const randomPassword = generateSecurePassword()
   const { data: newUser, error: createError } = await admin.auth.admin.createUser({
     email,
-    password: 'TemporaryPassword123!',
+    password: randomPassword,
     email_confirm: true,
     user_metadata: {
       full_name: fullName
@@ -58,17 +60,24 @@ export async function createMember(formData: FormData) {
        console.error('Update profile error:', profileError)
        throw new Error('Could not update user profile')
     }
+
+    // Send password reset email so the new user can set their own password
+    const { error: inviteError } = await admin.auth.admin.generateLink({
+      type: 'recovery',
+      email,
+    })
+    if (inviteError) {
+      console.error('Password reset invite error:', inviteError)
+      // Non-blocking: user was created, they can use "Forgot Password" manually
+    }
   }
 
   revalidatePath('/team', 'layout')
 }
 
 export async function updateMember(id: string, formData: FormData) {
-  const supabase = await createClient()
+  await requireAuth('admin')
   const admin = createAdminClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Not authenticated')
 
   const fullName = formData.get('full_name') as string
   const email = formData.get('email') as string
@@ -118,11 +127,8 @@ export async function updateMember(id: string, formData: FormData) {
 }
 
 export async function deleteMember(formData: FormData) {
-  const supabase = await createClient()
+  await requireAuth('admin')
   const admin = createAdminClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Not authenticated')
 
   const id = formData.get('id') as string
   if (!id) throw new Error('Missing user id')
@@ -142,11 +148,8 @@ export async function deleteMember(formData: FormData) {
 }
 
 export async function toggleUserStatus(id: string, currentStatus: string) {
-  const supabase = await createClient()
+  await requireAuth('admin')
   const admin = createAdminClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Not authenticated')
 
   const newStatus = currentStatus === 'active' ? 'inactive' : 'active'
   const { error } = await admin.from('profiles').update({ status: newStatus }).eq('id', id)

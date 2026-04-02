@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import styles from './NotificationCenter.module.css'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
@@ -21,7 +21,7 @@ export default function NotificationCenter() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const fetchNotifications = async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -169,7 +169,7 @@ export default function NotificationCenter() {
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Notifications"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
         </svg>
@@ -190,8 +190,9 @@ export default function NotificationCenter() {
               </div>
             ) : (
               notifications.map(n => (
-                <div 
+                <button 
                   key={n.id} 
+                  type="button"
                   className={`${styles.item} ${!n.is_read ? styles.unread : ''}`}
                   onClick={() => markAsRead(n.id)}
                 >
@@ -216,7 +217,7 @@ export default function NotificationCenter() {
                     </span>
                   </div>
                   {!n.is_read && <div className={styles.unreadDot} />}
-                </div>
+                </button>
               ))
             )}
           </div>

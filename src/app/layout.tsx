@@ -17,10 +17,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Personal Timesheet',
   description: 'A premium personal timesheet and payroll management application with atmospheric precision design.',
+  other: {
+    'theme-color': '#060e20',
+  },
 }
 
 import { Toaster } from 'sonner'
 import Providers from '@/components/Providers'
+import SkipToContent from '@/components/SkipToContent'
 
 export default function RootLayout({
   children,
@@ -30,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jakarta.variable} ${inter.variable}`}>
       <body>
+        <SkipToContent />
         <Toaster position="bottom-center" richColors theme="dark" closeButton />
         <Providers>
           {children}

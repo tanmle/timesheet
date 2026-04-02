@@ -1,15 +1,12 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { requireAuth } from '@/utils/auth'
 
 export async function createProject(formData: FormData) {
-  const supabase = await createClient()
+  await requireAuth('admin')
   const admin = createAdminClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Not authenticated')
 
   const name = formData.get('name') as string
   const rate = parseFloat(formData.get('rate') as string) || 0
@@ -34,11 +31,8 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProject(id: string, formData: FormData) {
-  const supabase = await createClient()
+  await requireAuth('admin')
   const admin = createAdminClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Not authenticated')
 
   const name = formData.get('name') as string
   const rate = parseFloat(formData.get('rate') as string) || 0
@@ -65,11 +59,8 @@ export async function updateProject(id: string, formData: FormData) {
 }
 
 export async function deleteProject(formData: FormData) {
-  const supabase = await createClient()
+  await requireAuth('admin')
   const admin = createAdminClient()
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Not authenticated')
 
   const id = formData.get('id') as string
   if (!id) throw new Error('Missing project id')
@@ -85,6 +76,7 @@ export async function deleteProject(formData: FormData) {
 }
 
 export async function toggleProjectStatus(id: string, currentStatus: string) {
+  await requireAuth('admin')
   const admin = createAdminClient()
   const newStatus = currentStatus === 'active' ? 'completed' : 'active'
   

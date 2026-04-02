@@ -1,11 +1,12 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { createNotification } from '@/utils/notifications'
+import { requireAuth } from '@/utils/auth'
 
 export async function toggleEntryPaidStatus(entryId: string, currentlyPaid: boolean) {
+  await requireAuth('admin')
   const supabase = createAdminClient()
 
   const { error } = await supabase
@@ -46,6 +47,7 @@ export async function processEmployeePayroll(
   totalAmount: number, 
   entryIds: string[]
 ) {
+  await requireAuth('admin')
   const supabase = createAdminClient()
 
   // 1. Create a record in the 'payroll' table for history

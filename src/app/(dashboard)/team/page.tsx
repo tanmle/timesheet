@@ -1,24 +1,25 @@
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 import TeamClient from './TeamClient'
 
 export default async function TeamPage() {
   const supabase = await createClient()
-  const admin = createAdminClient()
 
-  // Fetch all profiles from Supabase (excluding admins)
-  const { data: teamMembers = [] } = await supabase
-    .from('profiles')
-    .select('*')
-    .neq('role', 'admin')
-    .order('full_name')
+  // Parallelize team members + projects fetch
+  const [membersRes, projectsRes] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('*')
+      .neq('role', 'admin')
+      .order('full_name'),
+    supabase
+      .from('projects')
+      .select('id, name')
+      .order('name'),
+  ])
 
-  // Fetch all projects for the multiselect
-  const { data: projects = [] } = await supabase
-    .from('projects')
-    .select('id, name')
-    .order('name')
+  const teamMembers = membersRes.data || []
+  const projects = projectsRes.data || []
 
-  return <TeamClient teamMembers={teamMembers || []} projects={projects || []} />
+  return <TeamClient teamMembers={teamMembers} projects={projects} />
 }
 

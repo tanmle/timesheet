@@ -2,8 +2,10 @@
 
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { requireAuth } from '@/utils/auth'
 
 export async function deletePayrollRun(runId: string) {
+  await requireAuth('admin')
   const supabase = createAdminClient()
 
   // 1. Un-mark entries as paid and clear their link to this run

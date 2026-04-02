@@ -57,6 +57,8 @@ export default function ForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
+                spellCheck={false}
               />
             </div>
 

@@ -1,45 +1,33 @@
 import { createClient } from '@/utils/supabase/server'
+import { getAuthUser } from '@/utils/getAuthUser'
 import ReportClient from './ReportClient'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ReportsPage() {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getAuthUser()
   if (!user) return null
 
-  // 1. Get current profile to check role and project access
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-  const isAdmin = profile?.role === 'admin'
+  const isAdmin = user.role === 'admin'
+  const supabase = await createClient()
 
-  // 2. Fetch projects conditionally
-  let projects: any[] = []
-  if (isAdmin) {
-    const { data } = await supabase
-      .from('projects')
-      .select('id, name')
-      .order('name')
-    projects = data || []
-  } else {
-    const assignedIds = profile?.projects || []
-    if (assignedIds.length > 0) {
-      const { data } = await supabase
-        .from('projects')
-        .select('id, name')
-        .in('id', assignedIds)
-        .order('name')
-      projects = data || []
-    }
-  }
+  // Parallelize projects + profiles fetch
+  const projectsPromise = isAdmin
+    ? supabase.from('projects').select('id, name').order('name')
+    : (user.projects && user.projects.length > 0
+        ? supabase.from('projects').select('id, name').in('id', user.projects).order('name')
+        : Promise.resolve({ data: [] }))
 
-  // 3. Fetch profiles (Only for Admin)
-  const { data: initialProfiles } = await supabase
-    .from('profiles')
-    .select('id, full_name')
-    .order('full_name')
+  const profilesPromise = isAdmin
+    ? supabase.from('profiles').select('id, full_name').order('full_name')
+    : Promise.resolve({ data: [] })
 
-  const filteredProfiles = (isAdmin && initialProfiles) ? initialProfiles.filter(p => p.id !== user?.id) : []
+  const [projectsRes, profilesRes] = await Promise.all([projectsPromise, profilesPromise])
+
+  const projects = projectsRes.data || []
+  const filteredProfiles = isAdmin
+    ? (profilesRes.data || []).filter(p => p.id !== user.id)
+    : []
   
   return <ReportClient initialProjects={projects} initialProfiles={filteredProfiles} isAdmin={isAdmin} />
 }

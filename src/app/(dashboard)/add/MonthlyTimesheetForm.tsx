@@ -1,9 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import styles from './page.module.css'
-import DurationPicker from './DurationPicker'
 import { addTimeEntry, deleteTimeEntries, requestPayment } from './actions'
 import { createClient } from '@/utils/supabase/client'
 
@@ -29,7 +28,7 @@ export default function MonthlyTimesheetForm({
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedProjectId, setSelectedProjectId] = useState(projects[0]?.id || '')
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   // 1. Real-time Synchronization EFFECT
   useEffect(() => {
@@ -79,7 +78,7 @@ export default function MonthlyTimesheetForm({
     return () => {
       channelPromise.then(c => c && supabase.removeChannel(c))
     }
-  }, [month, year, supabase])
+  }, [month, year]) // supabase is stable via useMemo
 
   // Sync state if initialEntries prop changes (e.g. on first load)
   useEffect(() => {
@@ -366,12 +365,6 @@ function DurationPickerSmall({ initialMins = 0 }: { initialMins?: number }) {
 
   return (
     <>
-      <style>{`
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        @keyframes popIn { from { transform: translateX(-50%) translateY(10px) scale(0.95); opacity: 0; } to { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; } }
-        .time-chip:hover { background: rgba(255,255,255,0.1) !important; color: #fff !important; transform: translateY(-1px); }
-      `}</style>
-      
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {/* Quick Suggestions */}
         <div style={{ display: 'flex', gap: '6px' }}>

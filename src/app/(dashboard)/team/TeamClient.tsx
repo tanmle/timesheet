@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import styles from './page.module.css'
 import { createMember, updateMember, deleteMember, toggleUserStatus } from './actions'
+import ModalOverlay from '@/components/ModalOverlay'
 
 type Project = { id: string, name: string }
 type Member = { id: string, full_name: string, email?: string, hourly_rate: number, exchange_rate?: number, bank_name?: string, bank_number?: string, status: string, projects?: string[], role?: string }
@@ -281,17 +282,7 @@ export default function TeamClient({ teamMembers, projects }: { teamMembers: Mem
 
       {/* Editor Modal */}
       {modalMode && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 999999,
-          padding: 'var(--space-4)'
-        }}>
+        <ModalOverlay onClose={closeForm}>
           <div style={{
             background: '#0F172A',
             width: '100%',
@@ -382,7 +373,7 @@ export default function TeamClient({ teamMembers, projects }: { teamMembers: Mem
               </div>
             </form>
           </div>
-        </div>
+        </ModalOverlay>
       )}
     </div>
   )

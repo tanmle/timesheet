@@ -8,26 +8,28 @@ export const dynamic = 'force-dynamic'
 export default async function PayrollDashboardPage() {
   const supabase = await createClient()
 
-  // Fetch recent payroll runs
-  const { data: runs = [] } = await supabase
-    .from('payroll')
-    .select('*')
-    .order('created_at', { ascending: false })
+  // Parallelize payroll runs + unpaid entries fetch
+  const [runsRes, unpaidRes] = await Promise.all([
+    supabase
+      .from('payroll')
+      .select('*')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('time_entries')
+      .select('duration_minutes, profiles(hourly_rate, exchange_rate)')
+      .eq('is_paid', false),
+  ])
 
-  const pendingPayroll = runs?.find(r => r.status === 'draft')
-
-  // Calculate total unpaid from time_entries as a rough estimate
-  const { data: unpaidEntries = [] } = await supabase
-    .from('time_entries')
-    .select('*, profiles(hourly_rate, exchange_rate)')
-    .eq('is_paid', false)
+  const runs = runsRes.data || []
+  const unpaidEntries = unpaidRes.data || []
+  const pendingPayroll = runs.find(r => r.status === 'draft')
 
   let unbilledHours = 0
   let unbilledAmountVND = 0
-  unpaidEntries?.forEach(entry => {
+  unpaidEntries.forEach((entry: any) => {
     unbilledHours += (entry.duration_minutes / 60)
-    const rate = (entry.profiles as any)?.hourly_rate || 0
-    const exRate = (entry.profiles as any)?.exchange_rate || 25000
+    const rate = entry.profiles?.hourly_rate || 0
+    const exRate = entry.profiles?.exchange_rate || 25000
     unbilledAmountVND += (entry.duration_minutes / 60) * rate * exRate
   })
 

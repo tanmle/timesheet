@@ -109,6 +109,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  color-scheme: dark;
 }
 
 body {
@@ -271,6 +272,15 @@ button,
   opacity: 0.6;
 }
 
+/* Global focus-visible for keyboard accessibility */
+button:focus-visible,
+.btn:focus-visible,
+.btn-icon:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 select.input-field {
   cursor: pointer;
 }
@@ -320,7 +330,8 @@ select.input-field {
   border-radius: var(--radius-lg);
   padding: var(--space-4) var(--space-5);
   transition: all var(--transition-normal);
-  outline: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
   color-scheme: dark; /* Ensures native UI like dropdowns follow dark theme */
 }
 
@@ -333,10 +344,18 @@ select option {
   color: var(--outline);
 }
 
-.input-field:focus {
+.input-field:focus-visible {
+  background: rgba(141, 152, 255, 0.06);
+  border-color: rgba(141, 152, 255, 0.3);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.input-field:focus:not(:focus-visible) {
   background: rgba(141, 152, 255, 0.06);
   border-color: rgba(141, 152, 255, 0.3);
   box-shadow: 0 0 0 3px rgba(141, 152, 255, 0.08);
+  outline: none;
 }
 
 .input-label {
@@ -535,6 +554,27 @@ select option {
 .delay-7 { animation-delay: 0.35s; }
 .delay-8 { animation-delay: 0.4s; }
 
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in-up,
+  .animate-fade-in,
+  .animate-pulse,
+  .skeleton {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* ----- Responsive Container ----- */
 .container {
   width: 100%;
@@ -607,4 +647,23 @@ select option {
 @keyframes nprogress-spinner {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* ----- Number Input Spinners (hide for duration picker) ----- */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ----- Calendar Popup ----- */
+@keyframes popIn {
+  from { transform: translateX(-50%) translateY(10px) scale(0.95); opacity: 0; }
+  to { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+}
+
+.time-chip:hover {
+  background: rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
 }

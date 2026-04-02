@@ -38,6 +38,8 @@ function LoginForm() {
               className="input-field"
               placeholder="you@email.com"
               required
+              autoComplete="email"
+              spellCheck={false}
             />
           </div>
 
@@ -55,6 +57,7 @@ function LoginForm() {
               className="input-field"
               placeholder="••••••••"
               required
+              autoComplete="current-password"
             />
           </div>
 

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 import Link from 'next/link'
 import { toggleEntryPaidStatus, processEmployeePayroll } from './actions'
+import ModalOverlay from '@/components/ModalOverlay'
 
 type Profile = {
   id: string
@@ -222,17 +223,7 @@ export default function RunClient({
         })
 
         return (
-          <div style={{
-            position: 'fixed',
-            top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.85)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 999999,
-            padding: 'var(--space-4)'
-          }}>
+          <ModalOverlay onClose={closePayModal}>
             <div style={{
               background: '#0F172A',
               width: '100%',
@@ -287,7 +278,7 @@ export default function RunClient({
                 </form>
               </div>
             </div>
-          </div>
+          </ModalOverlay>
         )
       })()}
 

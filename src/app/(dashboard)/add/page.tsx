@@ -1,27 +1,33 @@
 import { createClient } from '@/utils/supabase/server'
+import { getAuthUser } from '@/utils/getAuthUser'
 import styles from './page.module.css'
 import MonthlyTimesheetForm from './MonthlyTimesheetForm'
 
 export default async function AddPage() {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getAuthUser()
   if (!user) return null
 
-  // Fetch projects user is assigned to
-  const { data: profile } = await supabase.from('profiles').select('projects').eq('id', user.id).single()
-  const projectIds = profile?.projects || []
+  const supabase = await createClient()
 
-  const { data: activeProjects = [] } = await supabase
-    .from('projects')
-    .select('*')
-    .in('id', projectIds)
-    .eq('status', 'active')
+  // Fetch profile projects + time entries in parallel
+  const projectIds = user.projects || []
 
-  const { data: timeEntries = [] } = await supabase
-    .from('time_entries')
-    .select('date, duration_minutes, project_id, is_paid')
-    .eq('user_id', user.id)
+  const [projectsRes, entriesRes] = await Promise.all([
+    projectIds.length > 0
+      ? supabase
+          .from('projects')
+          .select('*')
+          .in('id', projectIds)
+          .eq('status', 'active')
+      : Promise.resolve({ data: [] }),
+    supabase
+      .from('time_entries')
+      .select('date, duration_minutes, project_id, is_paid')
+      .eq('user_id', user.id),
+  ])
+
+  const activeProjects = projectsRes.data || []
+  const timeEntries = entriesRes.data || []
 
   return (
     <>
@@ -31,8 +37,8 @@ export default async function AddPage() {
       </div>
       
       <MonthlyTimesheetForm 
-        projects={activeProjects || []} 
-        entries={timeEntries || []} 
+        projects={activeProjects} 
+        entries={timeEntries} 
         month={new Date().getMonth()} 
         year={new Date().getFullYear()} 
       />
