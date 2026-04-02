@@ -253,6 +253,24 @@ export default function MonthlyTimesheetForm({
                       <input type="hidden" name="dates" value={selectedDates.join(',')} />
                       <input type="hidden" name="project_id" value={selectedProjectId} />
                       <input type="hidden" name="task" value="General Work" />
+                      
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--on-surface-variant)', fontWeight: 600 }}>
+                          {selectedDates.length > 1 ? `${selectedDates.length} Days` : 'Log hours'}
+                        </span>
+                        {hasLoggedTimeInSelection && (
+                          <button 
+                            type="submit"
+                            formAction={deleteTimeEntries}
+                            onClick={() => setTimeout(() => { setIsModalOpen(false); setSelectedDates([]) }, 500)}
+                            style={{ background: 'transparent', border: 'none', color: '#f87171', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer', padding: '2px 4px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          >
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            Clear
+                          </button>
+                        )}
+                      </div>
+
                       <div style={{ display: 'flex', gap: 'var(--space-2)' }}><DurationPickerSmall initialMins={selectedDates.length === 1 ? Math.round((hoursByDate[selectedDates[0]] || 0) * 60) : 0} /></div>
                       <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                         <button type="button" onClick={() => { setIsModalOpen(false); setSelectedDates([]) }} style={{ flex: 1, minHeight: '36px', borderRadius: '8px', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#fff' }}>Cancel</button>
