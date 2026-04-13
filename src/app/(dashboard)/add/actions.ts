@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { notifyAdmins } from '@/utils/notifications'
+import { sendTelegramMessage } from '@/utils/telegram'
 
 export async function addTimeEntry(formData: FormData) {
   const supabase = await createClient()
@@ -109,6 +110,12 @@ export async function requestPayment(month: string, year: string) {
     type: 'request',
     link: `/payroll/run?user_id=${user.id}&month=${monthIndex}&year=${year}`
   })
+
+  // Send Telegram Notification to Admin
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const telegramMsg = `<b>💰 Payment Request</b>\n\n<b>User:</b> ${name}\n<b>Period:</b> ${month} ${year}\n\n<a href="${appUrl}/payroll/run?user_id=${user.id}&month=${monthIndex}&year=${year}">▶ Process Payout</a>`
+  
+  await sendTelegramMessage(telegramMsg)
 
   revalidatePath('/', 'layout')
   return { success: true }
