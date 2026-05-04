@@ -58,12 +58,12 @@ export default function ReportClient({ initialProjects, initialProfiles, isAdmin
   }, 0)
 
   const totalEarnings = entries.reduce((acc, e) => {
-    const xRate = e.projects?.exchange_rate || e.profiles?.exchange_rate || 25000
+    const xRate = e.profiles?.exchange_rate || 25000
     return acc + (e.duration_minutes / 60 * (e.profiles?.hourly_rate || 0) * xRate)
   }, 0)
 
   const paidEarnings = entries.filter(e => e.is_paid).reduce((acc, e) => {
-    const xRate = e.projects?.exchange_rate || e.profiles?.exchange_rate || 25000
+    const xRate = e.profiles?.exchange_rate || 25000
     return acc + (e.duration_minutes / 60 * (e.profiles?.hourly_rate || 0) * xRate)
   }, 0)
 
@@ -225,9 +225,10 @@ export default function ReportClient({ initialProjects, initialProfiles, isAdmin
         ) : (
           entries.map(entry => {
             const entryHours = entry.duration_minutes / 60
-            const xRate = entry.projects?.exchange_rate || entry.profiles?.exchange_rate || 25000
-            const entryRevenue = entryHours * (entry.projects?.rate || 0) * xRate
-            const entryEarnings = entryHours * (entry.profiles?.hourly_rate || 0) * xRate
+            const revenueXRate = entry.projects?.exchange_rate || entry.profiles?.exchange_rate || 25000
+            const earningsXRate = entry.profiles?.exchange_rate || 25000
+            const entryRevenue = entryHours * (entry.projects?.rate || 0) * revenueXRate
+            const entryEarnings = entryHours * (entry.profiles?.hourly_rate || 0) * earningsXRate
             return (
               <div key={entry.id} className="glass-card" style={{ padding: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ flex: 1 }}>
