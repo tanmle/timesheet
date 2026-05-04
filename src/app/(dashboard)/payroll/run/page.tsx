@@ -3,10 +3,10 @@ import RunClient from './RunClient'
 
 export const dynamic = 'force-dynamic'
 
-export default async function PayrollDetailsPage({ searchParams }: { searchParams: { user_id?: string, month?: string, year?: string } }) {
+export default async function PayrollDetailsPage({ searchParams }: { searchParams: Promise<{ user_id?: string, month?: string, year?: string }> }) {
   const supabase = await createClient()
 
-  const { user_id, month, year } = searchParams
+  const { user_id, month, year } = await searchParams
   
   let query = supabase
     .from('time_entries')
@@ -58,5 +58,5 @@ export default async function PayrollDetailsPage({ searchParams }: { searchParam
      employeeData[pId].totalAmountVND += (hrs * usdRate) * exchangeRate
   })
 
-  return <RunClient employeeDataObj={employeeData} initialParams={searchParams} />
+  return <RunClient employeeDataObj={employeeData} initialParams={{ user_id, month, year }} />
 }

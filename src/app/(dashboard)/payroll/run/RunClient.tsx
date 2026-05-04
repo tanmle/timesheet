@@ -248,7 +248,7 @@ export default function RunClient({
                 <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', marginBottom: 'var(--space-6)' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
-                    src={`https://img.vietqr.io/image/${emp.profile.bank_name}-${emp.profile.bank_number}-compact2.png?amount=${selectedTotalVND}&addInfo=Payroll%20Payout`} 
+                    src={`https://img.vietqr.io/image/${emp.profile.bank_name}-${emp.profile.bank_number}-compact2.png?amount=${selectedTotalVND}&addInfo=${encodeURIComponent(`di khach ${String(Number(initialParams?.month ?? 0) + 1).padStart(2, '0')}${initialParams?.year ?? new Date().getFullYear()}`)}`} 
                     alt="VietQR code" 
                     style={{ width: '250px', height: '250px', display: 'block' }}
                   />
