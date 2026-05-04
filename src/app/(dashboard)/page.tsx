@@ -55,21 +55,32 @@ export default async function DashboardPage() {
 
   const now = new Date()
   const startOfThisMonthStr = formatYMD(new Date(now.getFullYear(), now.getMonth(), 1))
+  const startOfLastMonthStr = formatYMD(new Date(now.getFullYear(), now.getMonth() - 1, 1))
+  const endOfLastMonthStr = formatYMD(new Date(now.getFullYear(), now.getMonth(), 0))
+  const todayStr = formatYMD(now)
 
-  const entriesPromise = supabase
+  // Fetch entries from last month onward for stats (today, this month, last month)
+  const statsEntriesPromise = supabase
     .from('time_entries')
     .select('project_id, date, duration_minutes')
-    .gte('date', startOfThisMonthStr)
+    .gte('date', startOfLastMonthStr)
 
-  const [projectsRes, recentEntriesRes, entriesRes] = await Promise.all([
+  // Fetch all-time entries for total project hours
+  const allProjectEntriesPromise = supabase
+    .from('time_entries')
+    .select('project_id, duration_minutes')
+
+  const [projectsRes, recentEntriesRes, statsEntriesRes, allProjectEntriesRes] = await Promise.all([
     projectsPromise,
     recentEntriesPromise,
-    entriesPromise,
+    statsEntriesPromise,
+    allProjectEntriesPromise,
   ])
 
   const projects = projectsRes.data || []
   const recentEntries = recentEntriesRes.data || []
-  const filteredEntries = entriesRes.data || []
+  const statsEntries = statsEntriesRes.data || []
+  const allProjectEntries = allProjectEntriesRes.data || []
 
   const currentDate = now.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -77,22 +88,23 @@ export default async function DashboardPage() {
     day: 'numeric',
     year: 'numeric',
   })
-  
-  const startOfLastMonthStr = formatYMD(new Date(now.getFullYear(), now.getMonth() - 1, 1))
-  const endOfLastMonthStr = formatYMD(new Date(now.getFullYear(), now.getMonth(), 0))
-  const todayStr = formatYMD(now)
 
   let hoursToday = 0
   let hoursThisMonth = 0
   let hoursLastMonth = 0
-  const projectHours: Record<string, number> = {}
 
-  filteredEntries.forEach(e => {
+  statsEntries.forEach(e => {
     const h = e.duration_minutes / 60
-    projectHours[e.project_id] = (projectHours[e.project_id] || 0) + h
     if (e.date === todayStr) hoursToday += h
     if (e.date >= startOfThisMonthStr) hoursThisMonth += h
     if (e.date >= startOfLastMonthStr && e.date <= endOfLastMonthStr) hoursLastMonth += h
+  })
+
+  // Aggregate all-time hours per project
+  const projectHours: Record<string, number> = {}
+  allProjectEntries.forEach(e => {
+    const h = e.duration_minutes / 60
+    projectHours[e.project_id] = (projectHours[e.project_id] || 0) + h
   })
 
   // Dynamic stats calculation

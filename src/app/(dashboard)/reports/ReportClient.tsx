@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { getReportData } from './actions'
 import styles from './page.module.css'
 import DeleteEntryButton from '../components/DeleteEntryButton'
+import TeamCalendar from './TeamCalendar'
 
 type Entry = {
   id: string;
@@ -23,6 +24,7 @@ export default function ReportClient({ initialProjects, initialProfiles, isAdmin
   const [entries, setEntries] = useState<Entry[]>([])
   const [payrolls, setPayrolls] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar')
 
   const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i)
   const months = [
@@ -131,6 +133,65 @@ export default function ReportClient({ initialProjects, initialProfiles, isAdmin
           )}
         </div>
       </div>
+
+      {/* View Toggle */}
+      <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+        <button
+          type="button"
+          onClick={() => setViewMode('calendar')}
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRadius: '12px',
+            background: viewMode === 'calendar' ? 'rgba(159, 167, 255, 0.15)' : 'var(--surface-container-high)',
+            border: viewMode === 'calendar' ? '1px solid rgba(159, 167, 255, 0.3)' : '1px solid rgba(64, 72, 93, 0.3)',
+            color: viewMode === 'calendar' ? 'var(--primary)' : 'var(--on-surface-variant)',
+            fontWeight: viewMode === 'calendar' ? 700 : 500,
+            fontSize: '0.8125rem',
+            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+            transition: 'all 0.2s',
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          Calendar
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode('list')}
+          style={{
+            flex: 1,
+            padding: '10px',
+            borderRadius: '12px',
+            background: viewMode === 'list' ? 'rgba(159, 167, 255, 0.15)' : 'var(--surface-container-high)',
+            border: viewMode === 'list' ? '1px solid rgba(159, 167, 255, 0.3)' : '1px solid rgba(64, 72, 93, 0.3)',
+            color: viewMode === 'list' ? 'var(--primary)' : 'var(--on-surface-variant)',
+            fontWeight: viewMode === 'list' ? 700 : 500,
+            fontSize: '0.8125rem',
+            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+            transition: 'all 0.2s',
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6" />
+            <line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+            <line x1="3" y1="18" x2="3.01" y2="18" />
+          </svg>
+          List
+        </button>
+      </div>
+
+      {/* Calendar View */}
+      {viewMode === 'calendar' && <TeamCalendar isAdmin={isAdmin} />}
 
       {/* Stats Summary */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
