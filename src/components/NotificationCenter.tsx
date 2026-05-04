@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import styles from './NotificationCenter.module.css'
 import { createClient } from '@/utils/supabase/client'
 import { toast } from 'sonner'
@@ -20,7 +21,7 @@ export default function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const bellRef = useRef<HTMLButtonElement>(null)
   const supabase = useMemo(() => createClient(), [])
 
   const fetchNotifications = async () => {
@@ -123,16 +124,6 @@ export default function NotificationCenter() {
     }
   }, [])
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
   const markAsRead = async (id: string) => {
     if (id === 'reminder-static') {
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n))
@@ -162,9 +153,20 @@ export default function NotificationCenter() {
     }
   }
 
+  // Calculate dropdown position from bell button
+  const getDropdownPosition = () => {
+    if (!bellRef.current) return { top: 60, right: 20 }
+    const rect = bellRef.current.getBoundingClientRect()
+    return {
+      top: rect.bottom + 12,
+      right: window.innerWidth - rect.right,
+    }
+  }
+
   return (
-    <div className={styles.container} ref={dropdownRef}>
+    <>
       <button 
+        ref={bellRef}
         className={styles.bellBtn} 
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Notifications"
@@ -176,57 +178,72 @@ export default function NotificationCenter() {
         {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
       </button>
 
-      {isOpen && (
-        <div className={`glass-card-elevated ${styles.dropdown}`}>
-          <div className={styles.header}>
-            <h3>Notifications</h3>
+      {isOpen && createPortal(
+        <>
+          {/* Full-screen scrim */}
+          <div
+            className={styles.scrim}
+            onClick={() => setIsOpen(false)}
+          />
+          {/* Dropdown panel */}
+          <div
+            className={styles.dropdown}
+            style={{
+              top: getDropdownPosition().top,
+              right: getDropdownPosition().right,
+            }}
+          >
+            <div className={styles.header}>
+              <h3>Notifications</h3>
+            </div>
+            
+            <div className={styles.list}>
+              {notifications.length === 0 ? (
+                <div className={styles.empty}>
+                   <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📭</div>
+                   <p>All caught up!</p>
+                </div>
+              ) : (
+                notifications.map(n => (
+                  <button 
+                    key={n.id} 
+                    type="button"
+                    className={`${styles.item} ${!n.is_read ? styles.unread : ''}`}
+                    onClick={() => markAsRead(n.id)}
+                  >
+                    <div className={styles.icon}>{getIcon(n.type)}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <p style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 600, color: n.is_read ? 'var(--on-surface-variant)' : '#fff' }}>{n.title}</p>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--on-surface-variant)', lineHeight: 1.4 }}>{n.message}</p>
+                      {n.link && (
+                        <a 
+                          href={n.link}
+                          onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+                          style={{ 
+                            marginTop: '4px', fontSize: '0.7rem', color: '#60A5FA', 
+                            textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' 
+                          }}
+                        >
+                          Take Action <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </a>
+                      )}
+                      <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
+                        {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    {!n.is_read && <div className={styles.unreadDot} />}
+                  </button>
+                ))
+              )}
+            </div>
+            
+            <div className={styles.footer}>
+              <button onClick={() => setIsOpen(false)}>Close</button>
+            </div>
           </div>
-          
-          <div className={styles.list}>
-            {notifications.length === 0 ? (
-              <div className={styles.empty}>
-                 <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📭</div>
-                 <p>All caught up!</p>
-              </div>
-            ) : (
-              notifications.map(n => (
-                <button 
-                  key={n.id} 
-                  type="button"
-                  className={`${styles.item} ${!n.is_read ? styles.unread : ''}`}
-                  onClick={() => markAsRead(n.id)}
-                >
-                  <div className={styles.icon}>{getIcon(n.type)}</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <p style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 600, color: n.is_read ? 'var(--on-surface-variant)' : '#fff' }}>{n.title}</p>
-                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--on-surface-variant)', lineHeight: 1.4 }}>{n.message}</p>
-                    {n.link && (
-                      <a 
-                        href={n.link}
-                        onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
-                        style={{ 
-                          marginTop: '4px', fontSize: '0.7rem', color: '#60A5FA', 
-                          textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' 
-                        }}
-                      >
-                        Take Action <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    )}
-                    <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
-                      {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                  {!n.is_read && <div className={styles.unreadDot} />}
-                </button>
-              ))
-            )}
-          </div>
-          
-          <div className={styles.footer}>
-            <button onClick={() => setIsOpen(false)}>Close</button>
-          </div>
-        </div>
+        </>,
+        document.body
       )}
-    </div>
+    </>
   )
 }
