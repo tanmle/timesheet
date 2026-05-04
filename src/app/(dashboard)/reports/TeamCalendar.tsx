@@ -8,8 +8,8 @@ type CalendarEntry = {
   duration_minutes: number
   task_description: string
   project_id: string
-  profiles: { full_name: string } | null
-  projects: { name: string } | null
+  profiles: any
+  projects: any
 }
 
 interface TeamCalendarProps {
