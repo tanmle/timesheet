@@ -137,7 +137,7 @@ export default function RunClient({
           selectedEntries.forEach(entry => {
             const hrs = entry.duration_minutes / 60
             const usdRate = emp.profile.hourly_rate || 0
-            const xRate = entry.projects?.exchange_rate || emp.profile.exchange_rate || 25000
+            const xRate = emp.profile.exchange_rate || 25000
             currentTotalVND += (hrs * usdRate) * xRate
             currentTotalHours += hrs
           })
@@ -218,7 +218,7 @@ export default function RunClient({
         selectedForThisEmp.forEach(entry => {
           const hrs = entry.duration_minutes / 60
           const usdRate = emp.profile.hourly_rate || 0
-          const xRate = entry.projects?.exchange_rate || emp.profile.exchange_rate || 25000
+          const xRate = emp.profile.exchange_rate || 25000
           selectedTotalVND += (hrs * usdRate) * xRate
         })
 

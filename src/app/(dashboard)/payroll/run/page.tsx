@@ -50,8 +50,8 @@ export default async function PayrollDetailsPage({ searchParams }: { searchParam
      const hrs = entry.duration_minutes / 60
      const usdRate = entry.profiles.hourly_rate || 0
      
-     // USE PROJECT X-RATE FIRST, THEN USER X-RATE
-     const exchangeRate = entry.projects?.exchange_rate || entry.profiles?.exchange_rate || 25000
+     // USE PROFILE X-RATE (what we pay the employee)
+     const exchangeRate = entry.profiles?.exchange_rate || 25000
 
      employeeData[pId].totalHours += hrs
      employeeData[pId].totalAmountUSD += hrs * usdRate
