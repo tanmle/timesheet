@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
   // Currently the app routes don't explicitly have /dashboard, but the original layout grouping uses (dashboard).
   // If we assume any route except /login is protected, we can check it.
   
-  if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/auth')) {
+  if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/auth') && !request.nextUrl.pathname.startsWith('/api')) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
