@@ -11,6 +11,7 @@ CREATE TABLE public.invoices (
   total NUMERIC NOT NULL DEFAULT 0,
   notes TEXT,
   is_paid BOOLEAN DEFAULT false,
+  date_range_str TEXT,
   created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );

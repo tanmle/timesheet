@@ -152,6 +152,7 @@ export async function POST(req: Request) {
       sender_name: DEFAULT_SENDER,
       bill_to: DEFAULT_BILL_TO,
       invoice_date: invoiceDate.toISOString().split('T')[0],
+      date_range_str: dateRangeStr,
       items: invoiceDataPayload.items.map(i => ({
         name: i.name,
         quantity: i.quantity,

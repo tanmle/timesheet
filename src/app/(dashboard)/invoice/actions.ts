@@ -35,6 +35,7 @@ export async function saveInvoice(invoice: {
   senderName: string
   billTo: string
   invoiceDate: string
+  dateRangeStr: string
   items: { name: string; quantity: number; rate: number; amount: number }[]
   subtotal: number
   taxRate: number
@@ -51,6 +52,7 @@ export async function saveInvoice(invoice: {
     sender_name: invoice.senderName,
     bill_to: invoice.billTo,
     invoice_date: invoice.invoiceDate,
+    date_range_str: invoice.dateRangeStr,
     items: invoice.items,
     subtotal: invoice.subtotal,
     tax_rate: invoice.taxRate,

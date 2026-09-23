@@ -20,6 +20,7 @@ type InvoiceHistoryItem = {
   total: number
   notes: string | null
   is_paid: boolean
+  date_range_str: string | null
   created_at: string
 }
 
@@ -203,6 +204,7 @@ export default function InvoiceClient({
         senderName: data.senderName,
         billTo: data.billTo,
         invoiceDate: invoiceDate,
+        dateRangeStr: data.dateRangeStr,
         items: data.items.map(i => ({
           name: i.name,
           quantity: i.quantity,
@@ -252,7 +254,7 @@ export default function InvoiceClient({
       billTo: item.bill_to,
       invoiceNumber: item.invoice_number,
       invoiceDate: new Date(y, m - 1, d),
-      dateRangeStr: (item as any).date_range_str || '',
+      dateRangeStr: item.date_range_str || '',
       items: item.items.map(i => ({
         name: i.name,
         quantity: i.quantity,
