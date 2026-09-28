@@ -13,6 +13,7 @@ type NavItem = {
 
 const ADMIN_NAV_ITEMS: readonly NavItem[] = [
   { href: '/', label: 'Home', icon: 'home' },
+  { href: '/projects', label: 'Projects', icon: 'folder' },
   { href: '/payroll', label: 'Payroll', icon: 'payroll' },
   { href: '/invoice', label: 'Invoice', icon: 'invoice' },
   { href: '/reports', label: 'Reports', icon: 'reports' },
