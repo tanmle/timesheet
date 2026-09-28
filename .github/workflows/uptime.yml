@@ -1,0 +1,55 @@
+# Outside-in uptime check for the self-hosted deployment on los-mac-mini.
+#
+# Runs from GitHub's network, so it catches the failures nothing on the Mac
+# can report: the Mac being off, Tailscale/Funnel stopped, or Docker down.
+#
+# Required repo secrets:
+#   SUPABASE_ANON_KEY    the public anon key (Kong rejects /auth/v1/health without it)
+#   TELEGRAM_BOT_TOKEN   same bot the app uses
+#   TELEGRAM_CHAT_ID     same chat the app posts to
+#
+# Alerts on every failed run, so an outage alerts every 10 minutes until fixed.
+# GitHub may delay scheduled runs under load and disables schedules in public
+# repos after 60 days without repo activity.
+name: uptime
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      API_URL: https://los-mac-mini.tail4e0b47.ts.net:8443
+      APP_URL: https://los-mac-mini.tail4e0b47.ts.net
+    steps:
+      - name: Probe Supabase API and app
+        id: probe
+        env:
+          ANON: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          fail=""
+          code() { curl -s -o /dev/null -w '%{http_code}' --max-time 20 --retry 2 --retry-delay 5 "$@" || echo 000; }
+          api=$(code -H "apikey: $ANON" "$API_URL/auth/v1/health")
+          app=$(code "$APP_URL/login")
+          echo "api=$api app=$app"
+          [ "$api" = 200 ] || fail="$fail Supabase API /auth/v1/health -> $api;"
+          [ "$app" = 200 ] || fail="$fail App /login -> $app;"
+          echo "fail=$fail" >> "$GITHUB_OUTPUT"
+          [ -z "$fail" ]
+
+      - name: Alert on Telegram
+        if: failure()
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FAIL: ${{ steps.probe.outputs.fail }}
+        run: |
+          curl -s -o /dev/null --max-time 15 "https://api.telegram.org/bot$TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$CHAT" \
+            --data-urlencode "text=🔴 Timesheet is DOWN:${FAIL:- probe step errored}"
