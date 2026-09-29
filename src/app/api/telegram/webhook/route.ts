@@ -23,10 +23,10 @@ const DEFAULT_BILL_TO = 'Lexi Bellassa'
 const DEFAULT_RATE = 22.5
 const MAX_BILLABLE_HOURS = 70
 const DEFAULT_BANK = {
-  bankName: 'Mercury',
-  address: '2025 Guadalupe St. Ste 260, Austin, TX 78705',
-  routingNumber: '084106768',
-  accountNumber: '1000766793',
+  bankName: 'Community Federal Savings Bank',
+  address: '89-16 Jamaica Ave, Woodhaven, NY, 11421, United States',
+  routingNumber: '026073150',
+  accountNumber: '8312933725',
 }
 
 export async function POST(req: Request) {
