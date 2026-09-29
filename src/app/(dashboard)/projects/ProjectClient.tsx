@@ -10,7 +10,9 @@ type Project = {
   id: string, 
   name: string, 
   description: string, 
+  pricing_type: string,
   rate: number, 
+  fixed_price: number,
   exchange_rate: number,
   status: string, 
   actualHours: number,
@@ -29,6 +31,7 @@ type GlobalStats = {
 export default function ProjectClient({ projects, globalStats }: { projects: Project[], globalStats: GlobalStats }) {
   const [modalMode, setModalMode] = useState<'add' | 'edit' | null>(null)
   const [activeProject, setActiveProject] = useState<Project | null>(null)
+  const [pricingType, setPricingType] = useState<'hourly' | 'fixed'>('hourly')
 
   const activeProjects = projects.filter(p => p.status === 'active')
   const completedProjects = projects.filter(p => p.status === 'completed')
@@ -36,10 +39,12 @@ export default function ProjectClient({ projects, globalStats }: { projects: Pro
   const closeForm = () => {
     setModalMode(null)
     setActiveProject(null)
+    setPricingType('hourly')
   }
 
   const openEdit = (project: Project) => {
     setActiveProject(project)
+    setPricingType((project.pricing_type as 'hourly' | 'fixed') || 'hourly')
     setModalMode('edit')
   }
 
@@ -143,15 +148,33 @@ export default function ProjectClient({ projects, globalStats }: { projects: Pro
                 <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>DESCRIPTION</label>
                 <input type="text" name="description" defaultValue={activeProject?.description || ''} className="input-field" placeholder="Short description..." style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} />
               </div>
+              {/* Pricing Type Toggle */}
+              <div>
+                <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>PRICING TYPE</label>
+                <input type="hidden" name="pricing_type" value={pricingType} />
+                <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '4px' }}>
+                  <button type="button" onClick={() => setPricingType('hourly')} style={{ flex: 1, padding: '8px 16px', borderRadius: '10px', border: 'none', background: pricingType === 'hourly' ? '#2563EB' : 'transparent', color: '#fff', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.2s' }}>Hourly</button>
+                  <button type="button" onClick={() => setPricingType('fixed')} style={{ flex: 1, padding: '8px 16px', borderRadius: '10px', border: 'none', background: pricingType === 'fixed' ? '#2563EB' : 'transparent', color: '#fff', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.2s' }}>Fixed Price</button>
+                </div>
+              </div>
               <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-                <div style={{ flex: '1 1 140px' }}>
-                  <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>HOURLY RATE ($ / h)</label>
-                  <input type="number" name="rate" defaultValue={activeProject?.rate || ''} className="input-field" placeholder="50" min="0" step="1" required style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} />
-                </div>
-                <div style={{ flex: '1 1 140px' }}>
-                  <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>X-RATE (VND)</label>
-                  <input type="number" name="exchange_rate" defaultValue={activeProject?.exchange_rate || '25000'} className="input-field" placeholder="25000" min="0" step="1" required style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} />
-                </div>
+                {pricingType === 'hourly' ? (
+                  <div style={{ flex: '1 1 140px' }}>
+                    <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>HOURLY RATE ($ / h)</label>
+                    <input type="number" name="rate" defaultValue={activeProject?.rate || ''} className="input-field" placeholder="50" min="0" step="1" required style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  </div>
+                ) : (
+                  <div style={{ flex: '1 1 140px' }}>
+                    <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>FIXED PRICE (VND)</label>
+                    <CurrencyInput key={activeProject?.id || 'new'} name="fixed_price" defaultValue={activeProject?.fixed_price || ''} placeholder="5,000,000" />
+                  </div>
+                )}
+                {pricingType === 'hourly' && (
+                  <div style={{ flex: '1 1 140px' }}>
+                    <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>X-RATE (VND)</label>
+                    <input type="number" name="exchange_rate" defaultValue={activeProject?.exchange_rate || '25000'} className="input-field" placeholder="25000" min="0" step="1" required style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  </div>
+                )}
                 <div style={{ flex: '1 1 100%' }}>
                   <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>STATUS</label>
                   <select name="status" defaultValue={activeProject?.status || 'active'} className="input-field">
@@ -213,6 +236,9 @@ function ProjectCard({ project, onEdit }: { project: Project, onEdit: (p: Projec
             >
               {project.status === 'completed' ? '✓ Done' : '● Active'}
             </button>
+            {project.pricing_type === 'fixed' && (
+              <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '100px', background: 'rgba(168, 85, 247, 0.15)', color: '#C084FC', fontWeight: 700, letterSpacing: '0.05em' }}>FIXED: ₫{(project.fixed_price || 0).toLocaleString('vi-VN')}</span>
+            )}
           </div>
           <p className="text-muted" style={{ fontSize: '0.9rem', margin: 0 }}>{project.description || 'No description'}</p>
         </div>
@@ -249,3 +275,26 @@ function ProjectCard({ project, onEdit }: { project: Project, onEdit: (p: Projec
     </div>
   )
 }
+
+function CurrencyInput({ name, defaultValue, placeholder }: { name: string, defaultValue: string | number, placeholder: string }) {
+  const [val, setVal] = useState(defaultValue ? Number(defaultValue).toLocaleString('vi-VN') : '')
+  
+  return (
+    <>
+      <input 
+        type="text" 
+        value={val} 
+        onChange={(e) => {
+          const raw = e.target.value.replace(/\D/g, '')
+          setVal(raw ? Number(raw).toLocaleString('vi-VN') : '')
+        }} 
+        className="input-field" 
+        placeholder={placeholder} 
+        required 
+        style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} 
+      />
+      <input type="hidden" name={name} value={val.replace(/\D/g, '')} />
+    </>
+  )
+}
+

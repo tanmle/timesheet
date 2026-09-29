@@ -40,6 +40,9 @@ export async function createMember(formData: FormData) {
   const projects = formData.getAll('projects') as string[]
   const exchangeRateInput = formData.get('exchange_rate') as string
   const exchangeRate = parseFloat(exchangeRateInput) || 25000
+  const pricingType = (formData.get('pricing_type') as string) || 'hourly'
+  const fixedSalary = parseFloat(formData.get('fixed_salary') as string) || 0
+  const employmentType = (formData.get('employment_type') as string) || 'full_time'
   const bankName = formData.get('bank_name') as string || null
   const bankNumber = formData.get('bank_number') as string || null
 
@@ -50,6 +53,9 @@ export async function createMember(formData: FormData) {
       email: email,
       hourly_rate: hourlyRate,
       exchange_rate: exchangeRate,
+      pricing_type: pricingType,
+      fixed_salary: fixedSalary,
+      employment_type: employmentType,
       bank_name: bankName,
       bank_number: bankNumber,
       status: 'active',
@@ -85,6 +91,9 @@ export async function updateMember(id: string, formData: FormData) {
   const hourlyRate = parseFloat(hourlyRateInput) || 0
   const exchangeRateInput = formData.get('exchange_rate') as string
   const exchangeRate = parseFloat(exchangeRateInput) || 25000
+  const pricingType = (formData.get('pricing_type') as string) || 'hourly'
+  const fixedSalary = parseFloat(formData.get('fixed_salary') as string) || 0
+  const employmentType = (formData.get('employment_type') as string) || 'full_time'
   const bankName = formData.get('bank_name') as string || null
   const bankNumber = formData.get('bank_number') as string || null
   const status = formData.get('status') as string || 'active'
@@ -98,6 +107,9 @@ export async function updateMember(id: string, formData: FormData) {
     email: email || undefined,
     hourly_rate: hourlyRate,
     exchange_rate: exchangeRate,
+    pricing_type: pricingType,
+    fixed_salary: fixedSalary,
+    employment_type: employmentType,
     bank_name: bankName,
     bank_number: bankNumber,
     status,

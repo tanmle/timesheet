@@ -14,6 +14,8 @@ type Profile = {
   avatar_url: string | null
   hourly_rate: number
   exchange_rate: number
+  pricing_type?: string
+  fixed_salary?: number
   bank_name: string | null
   bank_number: string | null
 }
@@ -23,15 +25,18 @@ type EmployeeData = {
   totalHours: number
   totalAmountUSD: number
   totalAmountVND: number
+  isFixed?: boolean
   entries: any[]
 }
 
 export default function RunClient({ 
   employeeDataObj,
-  initialParams
+  initialParams,
+  businessDaysInMonth = 22
 }: { 
   employeeDataObj: Record<string, EmployeeData>,
-  initialParams?: { user_id?: string, month?: string, year?: string }
+  initialParams?: { user_id?: string, month?: string, year?: string },
+  businessDaysInMonth?: number
 }) {
   const router = useRouter()
   const [payingEmpId, setPayingEmpId] = useState<string | null>(null)
@@ -76,13 +81,24 @@ export default function RunClient({
       // Calculate the specific total for selected items
       let selectedTotalVND = 0
       let selectedTotalHours = 0
-      selectedForThisEmp.forEach(entry => {
-        const hrs = entry.duration_minutes / 60
-        const usdRate = emp.profile.hourly_rate || 0
-        const xRate = entry.projects?.exchange_rate || emp.profile.exchange_rate || 25000
-        selectedTotalVND += (hrs * usdRate) * xRate
-        selectedTotalHours += hrs
-      })
+      if (emp.isFixed || emp.profile.pricing_type === 'fixed') {
+        selectedForThisEmp.forEach(entry => {
+          selectedTotalHours += entry.duration_minutes / 60
+        })
+        if (selectedForThisEmp.length > 0) {
+          const fixedSalary = emp.profile.fixed_salary || 0
+          const uniqueDays = new Set(selectedForThisEmp.map(e => e.date)).size
+          selectedTotalVND = fixedSalary * (uniqueDays / businessDaysInMonth)
+        }
+      } else {
+        selectedForThisEmp.forEach(entry => {
+          const hrs = entry.duration_minutes / 60
+          const usdRate = emp.profile.hourly_rate || 0
+          const xRate = entry.projects?.exchange_rate || emp.profile.exchange_rate || 25000
+          selectedTotalVND += (hrs * usdRate) * xRate
+          selectedTotalHours += hrs
+        })
+      }
 
       await processEmployeePayroll(
         emp.profile.id,
@@ -134,13 +150,26 @@ export default function RunClient({
           const selectedEntries = emp.entries.filter(e => selectedEntryIds.has(e.id))
           let currentTotalVND = 0
           let currentTotalHours = 0
-          selectedEntries.forEach(entry => {
-            const hrs = entry.duration_minutes / 60
-            const usdRate = emp.profile.hourly_rate || 0
-            const xRate = emp.profile.exchange_rate || 25000
-            currentTotalVND += (hrs * usdRate) * xRate
-            currentTotalHours += hrs
-          })
+          let uniqueDays = 0
+          if (emp.isFixed || emp.profile.pricing_type === 'fixed') {
+            // Fixed salary: always the same amount if any entries are selected
+            selectedEntries.forEach(entry => {
+              currentTotalHours += entry.duration_minutes / 60
+            })
+            if (selectedEntries.length > 0) {
+              const fixedSalary = emp.profile.fixed_salary || 0
+              uniqueDays = new Set(selectedEntries.map(e => e.date)).size
+              currentTotalVND = fixedSalary * (uniqueDays / businessDaysInMonth)
+            }
+          } else {
+            selectedEntries.forEach(entry => {
+              const hrs = entry.duration_minutes / 60
+              const usdRate = emp.profile.hourly_rate || 0
+              const xRate = emp.profile.exchange_rate || 25000
+              currentTotalVND += (hrs * usdRate) * xRate
+              currentTotalHours += hrs
+            })
+          }
 
           return (
             <div key={emp.profile.id} className={`glass-card ${styles.employeeCard}`} style={{ padding: 'var(--space-5)' }}>
@@ -159,7 +188,18 @@ export default function RunClient({
                       )}
                     </div>
                     <p className={styles.employeeRole} style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: 'var(--on-surface-variant)' }}>
-                      Selected: <strong style={{ color: 'var(--on-surface)' }}>{currentTotalHours.toFixed(1)}h</strong> ({selectedEntries.length} items)
+                      {(emp.isFixed || emp.profile.pricing_type === 'fixed') ? (
+                        <>
+                          Fixed: <strong style={{ color: 'var(--on-surface)' }}>{uniqueDays} / {businessDaysInMonth} days</strong> selected ({selectedEntries.length} items)
+                        </>
+                      ) : (
+                        <>
+                          Selected: <strong style={{ color: 'var(--on-surface)' }}>{currentTotalHours.toFixed(1)}h</strong> ({selectedEntries.length} items)
+                        </>
+                      )}
+                      {(emp.isFixed || emp.profile.pricing_type === 'fixed') && (
+                        <span style={{ marginLeft: '8px', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(168, 85, 247, 0.15)', color: '#C084FC', fontWeight: 700 }}>FIXED SALARY</span>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -215,12 +255,20 @@ export default function RunClient({
         const emp = employeeDataObj[payingEmpId]
         const selectedForThisEmp = emp.entries.filter(e => selectedEntryIds.has(e.id))
         let selectedTotalVND = 0
-        selectedForThisEmp.forEach(entry => {
-          const hrs = entry.duration_minutes / 60
-          const usdRate = emp.profile.hourly_rate || 0
-          const xRate = emp.profile.exchange_rate || 25000
-          selectedTotalVND += (hrs * usdRate) * xRate
-        })
+        if (emp.isFixed || emp.profile.pricing_type === 'fixed') {
+          if (selectedForThisEmp.length > 0) {
+            const fixedSalary = emp.profile.fixed_salary || 0
+            const uniqueDays = new Set(selectedForThisEmp.map(e => e.date)).size
+            selectedTotalVND = fixedSalary * (uniqueDays / businessDaysInMonth)
+          }
+        } else {
+          selectedForThisEmp.forEach(entry => {
+            const hrs = entry.duration_minutes / 60
+            const usdRate = emp.profile.hourly_rate || 0
+            const xRate = emp.profile.exchange_rate || 25000
+            selectedTotalVND += (hrs * usdRate) * xRate
+          })
+        }
 
         return (
           <ModalOverlay onClose={closePayModal}>

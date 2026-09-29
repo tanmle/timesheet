@@ -11,6 +11,8 @@ export async function createProject(formData: FormData) {
   const name = formData.get('name') as string
   const rate = parseFloat(formData.get('rate') as string) || 0
   const exchange_rate = parseFloat(formData.get('exchange_rate') as string) || 25000
+  const pricing_type = (formData.get('pricing_type') as string) || 'hourly'
+  const fixed_price = parseFloat(formData.get('fixed_price') as string) || 0
 
   if (!name) throw new Error("Name required")
 
@@ -18,6 +20,8 @@ export async function createProject(formData: FormData) {
     name,
     rate,
     exchange_rate,
+    pricing_type,
+    fixed_price,
     description: formData.get('description') as string || '',
     status: 'active',
   })
@@ -37,6 +41,8 @@ export async function updateProject(id: string, formData: FormData) {
   const name = formData.get('name') as string
   const rate = parseFloat(formData.get('rate') as string) || 0
   const exchange_rate = parseFloat(formData.get('exchange_rate') as string) || 25000
+  const pricing_type = (formData.get('pricing_type') as string) || 'hourly'
+  const fixed_price = parseFloat(formData.get('fixed_price') as string) || 0
   const description = formData.get('description') as string || ''
   const status = formData.get('status') as string || 'active'
 
@@ -46,6 +52,8 @@ export async function updateProject(id: string, formData: FormData) {
     name,
     rate,
     exchange_rate,
+    pricing_type,
+    fixed_price,
     description,
     status
   }).eq('id', id)

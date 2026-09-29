@@ -9,6 +9,9 @@ export type UserProfile = {
   projects?: string[]
   hourly_rate?: number
   exchange_rate?: number
+  pricing_type?: string
+  fixed_salary?: number
+  employment_type?: string
 }
 
 /**
@@ -23,7 +26,7 @@ export const getAuthUser = cache(async (): Promise<UserProfile | null> => {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, role, projects, hourly_rate, exchange_rate')
+    .select('full_name, role, projects, hourly_rate, exchange_rate, pricing_type, fixed_salary, employment_type')
     .eq('id', user.id)
     .single()
 
@@ -35,5 +38,8 @@ export const getAuthUser = cache(async (): Promise<UserProfile | null> => {
     projects: profile?.projects ?? undefined,
     hourly_rate: profile?.hourly_rate ?? undefined,
     exchange_rate: profile?.exchange_rate ?? undefined,
+    pricing_type: profile?.pricing_type ?? undefined,
+    fixed_salary: profile?.fixed_salary ?? undefined,
+    employment_type: profile?.employment_type ?? undefined,
   }
 })

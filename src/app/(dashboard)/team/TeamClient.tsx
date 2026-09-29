@@ -7,7 +7,7 @@ import { createMember, updateMember, deleteMember, toggleUserStatus } from './ac
 import ModalOverlay from '@/components/ModalOverlay'
 
 type Project = { id: string, name: string }
-type Member = { id: string, full_name: string, email?: string, hourly_rate: number, exchange_rate?: number, bank_name?: string, bank_number?: string, status: string, projects?: string[], role?: string }
+type Member = { id: string, full_name: string, email?: string, pricing_type?: string, hourly_rate: number, fixed_salary?: number, employment_type?: string, exchange_rate?: number, bank_name?: string, bank_number?: string, status: string, projects?: string[], role?: string }
 
 function StatusToggleForm({ id, currentStatus }: { id: string; currentStatus: string }) {
   const active = currentStatus === 'active'
@@ -84,6 +84,26 @@ function MemberCard({ member, projectsList, onEdit, AVATAR_COLORS, index }: { me
             }}>
               {member.role || 'user'}
             </span>
+            {member.employment_type === 'part_time' && (
+              <span style={{ 
+                fontSize: '0.65rem', padding: '2px 8px', borderRadius: '100px', 
+                background: 'rgba(234, 179, 8, 0.15)', 
+                color: '#FACC15', 
+                fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' 
+              }}>
+                Part-Time
+              </span>
+            )}
+            {member.employment_type === 'full_time' && (
+              <span style={{ 
+                fontSize: '0.65rem', padding: '2px 8px', borderRadius: '100px', 
+                background: 'rgba(52, 211, 153, 0.15)', 
+                color: '#34D399', 
+                fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' 
+              }}>
+                Full-Time
+              </span>
+            )}
           </h3>
           <p className={styles.memberRole} style={{ margin: '2px 0 0 0' }}>{member.email || 'No email associated'}</p>
         </div>
@@ -99,8 +119,12 @@ function MemberCard({ member, projectsList, onEdit, AVATAR_COLORS, index }: { me
         <div className={styles.cardDetails} style={{ marginBottom: 'auto' }}>
           <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
             <div className={styles.detailItem} style={{ flex: 1, flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-              <span className={styles.detailLabel}>Hourly Rate</span>
-              <span className={styles.detailRate}>${member.hourly_rate || 0}/hr</span>
+              <span className={styles.detailLabel}>{member.pricing_type === 'fixed' ? 'Fixed Salary' : 'Hourly Rate'}</span>
+              <span className={styles.detailRate}>
+                {member.pricing_type === 'fixed'
+                  ? `₫${(member.fixed_salary || 0).toLocaleString('vi-VN')}/mo`
+                  : `$${member.hourly_rate || 0}/hr`}
+              </span>
             </div>
             <div className={styles.detailItem} style={{ flex: 1, flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
               <span className={styles.detailLabel}>Exchange Rate</span>
@@ -164,6 +188,7 @@ export default function TeamClient({ teamMembers, projects }: { teamMembers: Mem
   const [modalMode, setModalMode] = useState<'add' | 'edit' | null>(null)
   const [activeMember, setActiveMember] = useState<Member | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [pricingType, setPricingType] = useState<'hourly' | 'fixed'>('hourly')
   const [banks, setBanks] = useState<{ id: number, name: string, code: string, bin: string, shortName: string }[]>([])
 
   useEffect(() => {
@@ -195,11 +220,13 @@ export default function TeamClient({ teamMembers, projects }: { teamMembers: Mem
   const closeForm = () => {
     setModalMode(null)
     setActiveMember(null)
+    setPricingType('hourly')
   }
 
   const openEdit = (member: Member) => {
     setActiveMember(member)
     setModalMode('edit')
+    setPricingType((member.pricing_type as 'hourly' | 'fixed') || 'hourly')
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -312,16 +339,45 @@ export default function TeamClient({ teamMembers, projects }: { teamMembers: Mem
               </div>
               
               {activeMember?.role !== 'admin' && (
-                <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
-                  <div style={{ flex: 1 }}>
-                    <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>HOURLY RATE ($)</label>
-                    <input type="number" name="hourly_rate" defaultValue={activeMember?.hourly_rate || ''} className="input-field" placeholder="30" min="0" step="1" required style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} />
+                <>
+                  <div>
+                    <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>PRICING TYPE</label>
+                    <input type="hidden" name="pricing_type" value={pricingType} />
+                    <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '4px' }}>
+                      <button type="button" onClick={() => setPricingType('hourly')} style={{ flex: 1, padding: '8px 16px', borderRadius: '10px', border: 'none', background: pricingType === 'hourly' ? '#2563EB' : 'transparent', color: '#fff', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.2s' }}>Hourly</button>
+                      <button type="button" onClick={() => setPricingType('fixed')} style={{ flex: 1, padding: '8px 16px', borderRadius: '10px', border: 'none', background: pricingType === 'fixed' ? '#2563EB' : 'transparent', color: '#fff', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.2s' }}>Fixed Salary</button>
+                    </div>
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>EXCHANGE RATE (VND)</label>
-                    <input type="number" name="exchange_rate" defaultValue={activeMember?.exchange_rate || 25000} className="input-field" placeholder="25000" min="0" step="1" required style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
+                    <div style={{ flex: 1 }}>
+                      {pricingType === 'hourly' ? (
+                        <>
+                          <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>HOURLY RATE ($)</label>
+                          <input type="number" name="hourly_rate" defaultValue={activeMember?.hourly_rate || ''} className="input-field" placeholder="30" min="0" step="1" required style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} />
+                        </>
+                      ) : (
+                        <>
+                          <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>FIXED SALARY (VND/mo)</label>
+                          <CurrencyInput key={activeMember?.id || 'new'} name="fixed_salary" defaultValue={activeMember?.fixed_salary || ''} placeholder="2,000,000" />
+                        </>
+                      )}
+                    </div>
+                    {pricingType === 'hourly' && (
+                      <div style={{ flex: 1 }}>
+                        <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>EXCHANGE RATE (VND)</label>
+                        <input type="number" name="exchange_rate" defaultValue={activeMember?.exchange_rate || 25000} className="input-field" placeholder="25000" min="0" step="1" required style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} />
+                      </div>
+                    )}
                   </div>
-                </div>
+                  
+                  <div>
+                    <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>EMPLOYMENT TYPE</label>
+                    <select name="employment_type" defaultValue={activeMember?.employment_type || 'full_time'} className="input-field" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', appearance: 'none' }}>
+                      <option value="full_time">Full-time</option>
+                      <option value="part_time">Part-time</option>
+                    </select>
+                  </div>
+                </>
               )}
 
               <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
@@ -376,5 +432,28 @@ export default function TeamClient({ teamMembers, projects }: { teamMembers: Mem
         </ModalOverlay>
       )}
     </div>
+  )
+}
+
+function CurrencyInput({ name, defaultValue, placeholder }: { name: string, defaultValue: string | number, placeholder: string }) {
+  // Use React.useState since we might not have useState imported natively if not at top
+  const [val, setVal] = useState(defaultValue ? Number(defaultValue).toLocaleString('vi-VN') : '')
+  
+  return (
+    <>
+      <input 
+        type="text" 
+        value={val} 
+        onChange={(e) => {
+          const raw = e.target.value.replace(/\D/g, '')
+          setVal(raw ? Number(raw).toLocaleString('vi-VN') : '')
+        }} 
+        className="input-field" 
+        placeholder={placeholder} 
+        required 
+        style={{ width: '100%', background: 'rgba(255,255,255,0.05)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }} 
+      />
+      <input type="hidden" name={name} value={val.replace(/\D/g, '')} />
+    </>
   )
 }
