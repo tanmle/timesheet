@@ -121,7 +121,7 @@ export default function RunClient({
     <div className="container" style={{ paddingBottom: '100px' }}>
       {/* Header */}
       <header className={`${styles.header} animate-fade-in-up`}>
-        <div className={styles.headerTop} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className={styles.headerTop} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div className={styles.titleWrap} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
             <Link href="/payroll" className={styles.backBtn} aria-label="Back" style={{ color: 'var(--on-surface)' }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -130,6 +130,28 @@ export default function RunClient({
               </svg>
             </Link>
             <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: 0 }}>Run Payroll</h1>
+          </div>
+          
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--on-surface-variant)', fontWeight: 600 }}>Period:</span>
+            <select 
+              className="input-field" 
+              value={initialParams?.month ?? ''} 
+              onChange={(e) => {
+                const url = new URL(window.location.href)
+                if (e.target.value !== '') url.searchParams.set('month', e.target.value)
+                else url.searchParams.delete('month')
+                // Default to current year if not set
+                if (!url.searchParams.has('year')) url.searchParams.set('year', new Date().getFullYear().toString())
+                router.push(url.pathname + url.search)
+              }}
+              style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}
+            >
+              <option value="" style={{ color: '#000' }}>All Unpaid</option>
+              {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((m, i) => (
+                <option key={i} value={i} style={{ color: '#000' }}>{m}</option>
+              ))}
+            </select>
           </div>
         </div>
         <p className="text-muted" style={{ marginLeft: 'var(--space-10)', marginTop: 'var(--space-2)' }}>Review and process payouts securely.</p>
@@ -296,7 +318,7 @@ export default function RunClient({
                 <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', marginBottom: 'var(--space-6)' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
-                    src={`https://img.vietqr.io/image/${emp.profile.bank_name}-${emp.profile.bank_number}-compact2.png?amount=${selectedTotalVND}&addInfo=${encodeURIComponent(`di khach ${String(Number(initialParams?.month ?? 0) + 1).padStart(2, '0')}${initialParams?.year ?? new Date().getFullYear()}`)}`} 
+                    src={`https://img.vietqr.io/image/${emp.profile.bank_name}-${emp.profile.bank_number}-compact2.png?amount=${Math.round(selectedTotalVND)}&addInfo=${encodeURIComponent(`di khach ${String(Number(initialParams?.month ?? 0) + 1).padStart(2, '0')}${initialParams?.year ?? new Date().getFullYear()}`)}`} 
                     alt="VietQR code" 
                     style={{ width: '250px', height: '250px', display: 'block' }}
                   />

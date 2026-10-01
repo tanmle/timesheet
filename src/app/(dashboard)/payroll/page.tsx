@@ -16,7 +16,7 @@ export default async function PayrollDashboardPage() {
       .order('created_at', { ascending: false }),
     supabase
       .from('time_entries')
-      .select('duration_minutes, profiles(hourly_rate, exchange_rate)')
+      .select('duration_minutes, date, user_id, profiles(hourly_rate, exchange_rate, pricing_type, fixed_salary)')
       .eq('is_paid', false),
   ])
 
@@ -26,11 +26,46 @@ export default async function PayrollDashboardPage() {
 
   let unbilledHours = 0
   let unbilledAmountVND = 0
+
+  const userMonthGroups: Record<string, { profile: any, entries: any[] }> = {}
+
   unpaidEntries.forEach((entry: any) => {
     unbilledHours += (entry.duration_minutes / 60)
-    const rate = entry.profiles?.hourly_rate || 0
-    const exRate = entry.profiles?.exchange_rate || 25000
-    unbilledAmountVND += (entry.duration_minutes / 60) * rate * exRate
+    
+    // Group by user and month for accurate fixed salary proration
+    const [yStr, mStr] = entry.date.split('-') // e.g. "2026-09-30" -> "2026", "09"
+    const monthKey = `${yStr}-${parseInt(mStr) - 1}` // convert to 0-indexed month
+    const groupKey = `${entry.user_id}_${monthKey}`
+
+    if (!userMonthGroups[groupKey]) {
+      userMonthGroups[groupKey] = { profile: entry.profiles, entries: [] }
+    }
+    userMonthGroups[groupKey].entries.push(entry)
+  })
+
+  Object.entries(userMonthGroups).forEach(([key, group]) => {
+    const monthKeyMatch = key.split('_')[1].match(/(\d+)-(\d+)/)
+    if (!monthKeyMatch) return
+    const y = parseInt(monthKeyMatch[1])
+    const m = parseInt(monthKeyMatch[2])
+
+    if (group.profile?.pricing_type === 'fixed') {
+      let businessDaysInMonth = 0
+      const d = new Date(y, m, 1)
+      while (d.getMonth() === m) {
+        if (d.getDay() !== 0 && d.getDay() !== 6) businessDaysInMonth++
+        d.setDate(d.getDate() + 1)
+      }
+      
+      const uniqueDays = new Set(group.entries.map(e => e.date)).size
+      unbilledAmountVND += (group.profile.fixed_salary || 0) * (uniqueDays / (businessDaysInMonth || 22))
+    } else {
+      const rate = group.profile?.hourly_rate || 0
+      const exRate = group.profile?.exchange_rate || 25000
+      let hrs = 0
+      group.entries.forEach(e => hrs += (e.duration_minutes / 60))
+      unbilledAmountVND += hrs * rate * exRate
+    }
   })
 
   return (
