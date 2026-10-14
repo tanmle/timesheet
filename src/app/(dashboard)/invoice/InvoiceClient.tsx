@@ -33,7 +33,7 @@ type ProjectEditItem = {
 
 // Default hardcoded values
 const DEFAULT_SENDER = 'Khoa Nguyen'
-const DEFAULT_BILL_TO = 'Lexi Bellassa'
+const DEFAULT_BILL_TO = 'Social Study Media LLC'
 const DEFAULT_RATE = 22.5
 const DEFAULT_MAX_BILLABLE_HOURS = 0 // 0 = no cap
 const DEFAULT_BANK = {
