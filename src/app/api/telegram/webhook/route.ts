@@ -19,7 +19,7 @@ const DEFAULT_PROJECT_MAPPING: Record<string, string> = {
 }
 
 const DEFAULT_SENDER = 'Khoa Nguyen'
-const DEFAULT_BILL_TO = 'Lexi Bellassa'
+const DEFAULT_BILL_TO = 'Social Study Media LLC'
 const DEFAULT_RATE = 22.5
 const MAX_BILLABLE_HOURS = 70
 const DEFAULT_BANK = {

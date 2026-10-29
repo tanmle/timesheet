@@ -35,7 +35,7 @@ type ProjectEditItem = {
 const DEFAULT_SENDER = 'Khoa Nguyen'
 const DEFAULT_BILL_TO = 'Social Study Media LLC'
 const DEFAULT_RATE = 22.5
-const DEFAULT_MAX_BILLABLE_HOURS = 0 // 0 = no cap
+const DEFAULT_MAX_BILLABLE_HOURS = 70
 const DEFAULT_BANK = {
   bankName: 'Community Federal Savings Bank',
   address: '89-16 Jamaica Ave, Woodhaven, NY, 11421, United States',
