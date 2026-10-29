@@ -24,7 +24,7 @@ export default async function GlobalHeader() {
   const firstName = user.full_name?.split(' ')[0] || 'User'
 
   return (
-    <header className={`${styles.header} animate-fade-in-up`} style={{ marginBottom: 'var(--space-4)' }} suppressHydrationWarning>
+    <header className={`${styles.header} animate-fade-in-up no-print`} style={{ marginBottom: 'var(--space-4)' }} suppressHydrationWarning>
       <div className={styles.headerTop}>
         <div>
           <p className={styles.greeting} suppressHydrationWarning>{greeting}</p>

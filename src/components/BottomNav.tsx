@@ -16,6 +16,7 @@ const ADMIN_NAV_ITEMS: readonly NavItem[] = [
   { href: '/projects', label: 'Projects', icon: 'folder' },
   { href: '/payroll', label: 'Payroll', icon: 'payroll' },
   { href: '/invoice', label: 'Invoice', icon: 'invoice' },
+  { href: '/cv', label: 'CV', icon: 'cv' },
   { href: '/reports', label: 'Reports', icon: 'reports' },
   { href: '/team', label: 'Team', icon: 'team' },
 ] as const
@@ -73,6 +74,16 @@ function NavIcon({ name, isAction }: { name: string; isAction?: boolean }) {
         <line x1="16" y1="17" x2="8" y2="17" />
       </svg>
     ),
+    cv: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="2" />
+        <line x1="13" y1="8" x2="17" y2="8" />
+        <line x1="13" y1="11" x2="17" y2="11" />
+        <line x1="7" y1="15" x2="17" y2="15" />
+        <line x1="7" y1="18" x2="14" y2="18" />
+      </svg>
+    ),
     reports: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <line x1="18" y1="20" x2="18" y2="10" />
@@ -93,10 +104,10 @@ export default function BottomNav({ role }: BottomNavProps) {
   const navItems = role === 'admin' ? ADMIN_NAV_ITEMS : USER_NAV_ITEMS
 
   return (
-    <nav className={styles.nav} id="bottom-navigation">
+    <nav className={`${styles.nav} no-print`} id="bottom-navigation">
       <div className={styles.navInner}>
         {navItems.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
           return (
             <Link
               key={item.href}

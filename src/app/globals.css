@@ -667,3 +667,69 @@ input::-webkit-inner-spin-button {
   color: #fff !important;
   transform: translateY(-1px);
 }
+
+
+/* ===================================================================
+   GLOBAL PRINT RULES (CV & DOCUMENT PRINTING)
+   =================================================================== */
+@media print {
+  /* Hide all dashboard chrome: header, bottom nav, notifications, devtools, action buttons */
+  #bottom-navigation,
+  .no-print,
+  [data-no-print],
+  nav,
+  header:not(#cv-printable-area header),
+  aside,
+  #user-avatar,
+  .toast,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  /* Reset document for clean white paper printing */
+  html,
+  body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  main#main-content {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
+  main#main-content > .container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Ensure CV paper fills page without shadows */
+  #cv-printable-area {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm;
+  }
+}

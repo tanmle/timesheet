@@ -1,0 +1,320 @@
+.previewContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+}
+
+.cvPaper {
+  background: #ffffff;
+  color: #1e293b;
+  width: 100%;
+  max-width: 860px;
+  min-height: 1100px;
+  padding: 44px 50px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* Header */
+.header {
+  margin-bottom: 18px;
+}
+
+.fullName {
+  font-size: 30px;
+  font-weight: 800;
+  color: #1b365d;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  margin: 0 0 4px 0;
+}
+
+.jobTitle {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #334155;
+  margin: 0 0 16px 0;
+  line-height: 1.3;
+}
+
+.divider {
+  border: none;
+  border-bottom: 2px solid #1b365d;
+  margin: 0 0 18px 0;
+}
+
+/* Sections */
+.sectionRow {
+  display: flex;
+  margin-bottom: 22px;
+  align-items: flex-start;
+}
+
+.sectionTitle {
+  width: 180px;
+  min-width: 180px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #1b365d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.35;
+  padding-right: 18px;
+  box-sizing: border-box;
+}
+
+.sectionContent {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Contact Information */
+.contactGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+}
+
+.contactLine {
+  display: flex;
+  gap: 8px;
+  color: #1e293b;
+}
+
+.contactLabel {
+  font-weight: 700;
+  color: #0f172a;
+  min-width: 60px;
+}
+
+.contactValue {
+  color: #334155;
+}
+
+/* Objective */
+.objectiveText {
+  white-space: pre-line;
+  color: #334155;
+  line-height: 1.55;
+  text-align: justify;
+  margin: 0;
+}
+
+/* Experience */
+.experienceList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.experienceItem {
+  display: flex;
+  align-items: flex-start;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.expPeriod {
+  width: 140px;
+  min-width: 140px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1.4;
+  padding-right: 12px;
+  box-sizing: border-box;
+}
+
+.expDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.expRole {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.expCompany {
+  font-size: 12.5px;
+  color: #475569;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.bulletList {
+  margin: 4px 0 6px 0;
+  padding-left: 18px;
+  list-style-type: disc;
+}
+
+.bulletItem {
+  color: #334155;
+  line-height: 1.48;
+  margin-bottom: 3px;
+  font-size: 12.5px;
+}
+
+.subHeading {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 8px 0 2px 0;
+}
+
+.envList {
+  margin: 2px 0 6px 0;
+  padding-left: 18px;
+  list-style-type: disc;
+}
+
+/* Education */
+.educationList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.educationItem {
+  display: flex;
+  align-items: flex-start;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.eduPeriod {
+  width: 140px;
+  min-width: 140px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  padding-right: 12px;
+  box-sizing: border-box;
+}
+
+.eduDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.eduDegree {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.eduSchool {
+  font-size: 12.5px;
+  color: #475569;
+}
+
+/* Skills */
+.skillBlock {
+  margin-bottom: 12px;
+}
+
+.skillTitle {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+/* Print Styles */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 14mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .previewContainer {
+    padding: 0 !important;
+    display: block !important;
+  }
+
+  .cvPaper {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    color: #000000 !important;
+  }
+
+  .sectionRow {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .experienceItem,
+  .educationItem,
+  .skillBlock {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+
+/* Sub Projects inside Experience (Merged Company) */
+.subProjectsContainer {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 12px;
+  border-left: 2px solid #cbd5e1;
+}
+
+.subProjectItem {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.subProjectHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.subProjectTitle {
+  font-size: 12.5px;
+  color: #0f172a;
+}
+
+.subProjectRole {
+  color: #1e3a8a;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.subProjectPeriod {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+
+.subProjectsLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1b365d;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
